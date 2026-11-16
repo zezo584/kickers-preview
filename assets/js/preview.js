@@ -26,7 +26,7 @@
       brandLead: 'منتجات العلامة', heroLabel: 'عروض كيكرز', slideOf: function (a, b) { return a + ' من ' + b; },
       h1: 'كيكرز فودز للصناعات الغذائية: بسكويت وكريمة شوكولاتة بالبندق',
       count: function (n) { return n === 1 ? 'منتج واحد' : n === 2 ? 'منتجين' : n <= 10 ? n + ' منتجات' : n + ' منتج'; },
-      preview: 'معاينة'
+      preview: 'معاينة', exportN: 'التصدير', quick: 'عرض سريع', details: 'تفاصيل المنتج'
     },
     en: {
       skip: 'Skip to content', home: 'Home', about: 'About us', products: 'Products', brands: 'Brands', contact: 'Contact',
@@ -46,7 +46,7 @@
       brandLead: 'Products by', heroLabel: 'Kickers highlights', slideOf: function (a, b) { return a + ' of ' + b; },
       h1: 'Kickers Foods: biscuits and chocolate hazelnut spread',
       count: function (n) { return n + (n === 1 ? ' product' : ' products'); },
-      preview: 'Preview'
+      preview: 'Preview', exportN: 'Export', quick: 'Quick view', details: 'Product details'
     }
   };
 
@@ -64,9 +64,9 @@
 
   /* ---------- Header / drawer / footer ---------- */
   function header(route) {
-    var nav = [['home', '#home'], ['about', '#about'], ['products', '#products'], ['contact', '#contact']];
+    var nav = [['home', '#home'], ['about', '#about'], ['products', '#products'], ['exportN', '#export'], ['contact', '#contact']];
     var items = nav.map(function (n) {
-      var cur = route === n[0] || (n[0] === 'products' && /^(products|cat|brand|product)$/.test(route));
+      var cur = route === n[0] || (n[0] === 'exportN' && route === 'export') || (n[0] === 'products' && /^(products|cat|brand|product)$/.test(route));
       if (n[0] === 'products') {
         var sub = C.categories.map(function (c) { return '<li><a href="#cat-' + c.slug + '"><span class="dot" style="--c:' + c.color + '"></span>' + esc(L(c, 'name')) + '</a></li>'; }).join('');
         return '<li class="has-sub"><a href="' + n[1] + '"' + (cur ? ' aria-current="page"' : '') + '>' + t(n[0]) + '</a>' +
@@ -75,7 +75,7 @@
       return '<li><a href="' + n[1] + '"' + (cur ? ' aria-current="page"' : '') + '>' + t(n[0]) + '</a></li>';
     }).join('');
     var dnav = nav.map(function (n) { return '<li><a href="' + n[1] + '">' + t(n[0]) + '</a></li>'; }).join('');
-    return '<a class="skip-link" href="#main">' + t('skip') + '</a>' +
+    return '<div class="progress" data-progress aria-hidden="true"></div><a class="skip-link" href="#main">' + t('skip') + '</a>' +
       '<div class="intro crimp-b" data-intro aria-hidden="true"><div class="intro-logo-wrap"><img class="intro-logo" src="assets/img/brand/logo.webp" alt="" width="241" height="120"></div></div>' +
       '<header class="site-header" data-header><div class="wrap header-in">' +
       '<a class="brand" href="#home" aria-label="' + esc(L(C.site, 'name')) + '"><img src="assets/img/brand/logo.webp" alt="' + esc(L(C.site, 'name')) + '" width="241" height="120"></a>' +
@@ -121,11 +121,16 @@
   }
   var WAVES = '<div class="slide-bg" aria-hidden="true"><svg viewBox="0 0 1440 500" preserveAspectRatio="none"><path class="wave-a" d="M0,170 C240,90 420,260 720,170 C1000,85 1180,230 1440,140 L1440,500 L0,500 Z"/><path class="wave-b" d="M0,280 C300,200 520,360 860,270 C1100,205 1280,320 1440,250 L1440,500 L0,500 Z"/></svg></div>';
 
+  function sprinkles() {
+    var cols = ['#FFC928', '#fff', '#FF8FA0', '#7A4A2D', '#FFE27F'], out = '';
+    for (var i = 0; i < 16; i++) out += '<i style="--x:' + ((i * 37) % 100) + '%;--c:' + cols[i % 5] + ';--t:' + (7 + (i % 5) * 1.6) + 's;--dl:' + (-i * 1.1) + 's"></i>';
+    return '<div class="sprinkles" aria-hidden="true">' + out + '</div>';
+  }
   function hero() {
     var n = C.slides.length;
     var slides = C.slides.map(function (s, i) {
       var packs = s.images.map(function (p, k) { return '<div class="px pk pk-' + (k + 1) + '"><div class="pk-in"><img src="' + img(p) + '" alt="" ' + (i === 0 && k === 0 ? 'fetchpriority="high"' : 'loading="lazy"') + '></div></div>'; }).join('');
-      return '<div class="slide" data-theme="' + s.theme + '" role="group" aria-roledescription="slide" aria-label="' + esc(T[lang].slideOf(i + 1, n)) + '">' + WAVES +
+      return '<div class="slide" data-theme="' + s.theme + '" role="group" aria-roledescription="slide" aria-label="' + esc(T[lang].slideOf(i + 1, n)) + '">' + WAVES + sprinkles() +
         '<div class="slide-word" aria-hidden="true">' + esc(s.word) + '</div>' +
         '<div class="wrap slide-grid"><div class="slide-copy"><h2 class="slide-title">' + esc(L(s, 'title')) + '</h2><p class="slide-sub">' + esc(L(s, 'sub')) + '</p>' +
         '<div class="slide-cta"><a class="btn btn-main" href="' + slideUrl(s.btn1_url) + '">' + esc(L(s, 'btn1')) + ico('i-arrow', 'ico-dir') + '</a>' +
@@ -160,16 +165,53 @@
       '<h3>' + esc(L(c, 'name')) + '</h3><p>' + esc(L(c, 'desc')) + '</p><span class="cat-meta"><span class="cat-count">' + T[lang].count(ps.length) + '</span><span class="cat-go">' + ico('i-arrow', 'ico-dir') + '</span></span></a>';
   }
   function cats() {
-    return '<section class="section cats"><div class="wrap"><header class="sec-head"><h2>' + esc(L(C.home, 'cats_title')) + '</h2><p>' + esc(L(C.home, 'cats_text')) + '</p></header>' +
+    return '<section class="section cats"><span class="drift" data-speed=".8" style="left:2%;top:30%;--s:44px">' + ico('d-wheat') + '</span><span class="drift" data-speed="1.3" style="right:3%;top:12%;--s:52px">' + ico('d-biscuit') + '</span><div class="wrap"><header class="sec-head"><h2>' + esc(L(C.home, 'cats_title')) + '</h2><p>' + esc(L(C.home, 'cats_text')) + '</p></header>' +
       '<div class="cat-grid" data-stagger>' + C.categories.map(catTile).join('') + '</div></div></section>';
   }
 
   function card(p) {
     var b = brand(p.brand), c = cat(p.cat);
-    return '<article class="p-card" data-cat="' + c.slug + '" style="--tint:' + p.tint + '"><a class="p-link" href="#product-' + p.slug + '">' +
-      '<div class="p-media crimp-b"><img src="' + img(p.img) + '" alt="' + esc(L(p, 'name')) + '" loading="lazy" width="300" height="200"></div>' +
+    var q = ' data-quick data-title="' + esc(L(p, 'name')) + '" data-img="' + img(p.img) + '" data-desc="' + esc(L(p, 'desc')) + '" data-weight="' + esc(p.weight_ar ? L(p, 'weight') : '') + '" data-brand="' + esc(b.name_en) + '" data-bc="' + b.color + '" data-cat="' + esc(L(c, 'name')) + '" data-tint="' + p.tint + '" data-url="#product-' + p.slug + '" data-more-label="' + esc(t('details')) + '" data-wa="' + WA + '" data-wa-label="' + esc(t('orderWa')) + '"';
+    return '<article class="p-card" data-tilt data-cat="' + c.slug + '" style="--tint:' + p.tint + '"><a class="p-link" href="#product-' + p.slug + '">' +
+      '<div class="p-media"><span class="p-plate" aria-hidden="true">' + ico('d-plate') + '</span><img src="' + img(p.img) + '" alt="' + esc(L(p, 'name')) + '" loading="lazy" width="300" height="200"></div>' +
       '<div class="p-body"><span class="p-brand" style="--bc:' + b.color + '">' + esc(b.name_en) + '</span><h3 class="p-title">' + esc(L(p, 'name')) + '</h3>' +
-      '<div class="p-foot">' + (p.weight_ar ? '<span class="p-weight">' + esc(L(p, 'weight')) + '</span>' : '<span></span>') + '<span class="p-go" aria-hidden="true">' + ico('i-arrow', 'ico-dir') + '</span></div></div></a></article>';
+      '<div class="p-foot">' + (p.weight_ar ? '<span class="p-weight">' + esc(L(p, 'weight')) + '</span>' : '<span></span>') + '<span class="p-go" aria-hidden="true">' + ico('i-arrow', 'ico-dir') + '</span></div></div></a>' +
+      '<button class="p-quick" type="button" aria-label="' + esc(t('quick') + ': ' + L(p, 'name')) + '"' + q + '>' + ico('i-eye') + '</button></article>';
+  }
+
+  function showcase() {
+    var E = C.export;
+    var list = C.products;
+    var items = list.map(function (p) {
+      var b = brand(p.brand);
+      return '<a class="cf-item" href="#product-' + p.slug + '" data-title="' + esc(L(p, 'name')) + '" data-desc="' + esc(L(p, 'desc')) + '" data-weight="' + esc(p.weight_ar ? L(p, 'weight') : '') + '" data-brand="' + esc(b.name_en) + '" data-bc="' + b.color + '" data-tint="' + p.tint + '">' +
+        '<span class="cf-plate" aria-hidden="true">' + ico('d-plate') + '</span><img src="' + img(p.img) + '" alt="' + esc(L(p, 'name')) + '" loading="lazy"></a>';
+    }).join('');
+    return '<section class="section showcase crimp-tb"><div class="wrap"><header class="sec-head"><h2>' + esc(L(E, 'showcase_title')) + '</h2><p>' + esc(L(E, 'showcase_text')) + '</p></header>' +
+      '<div class="cf" data-cf tabindex="0" aria-roledescription="carousel"><div class="cf-stage">' + items + '</div>' +
+      '<div class="cf-bottom"><div class="cf-info" aria-live="polite"><span class="p-brand cf-brand"></span><h3 class="cf-title"></h3><p class="cf-desc"></p><div class="cf-row"><span class="p-weight cf-weight"></span><a class="btn btn-sm cf-link" href="#">' + t('details') + ico('i-arrow', 'ico-dir') + '</a></div></div>' +
+      '<div class="cf-ctrl"><button type="button" data-cf-prev aria-label="' + t('prev') + '">' + ico('i-arrow', 'ico-dir prev-ico') + '</button><button type="button" data-cf-next aria-label="' + t('next') + '">' + ico('i-arrow', 'ico-dir') + '</button></div></div></div></div></section>';
+  }
+
+  function globe() {
+    var dots = '';
+    for (var y = 6; y < 100; y += 8) for (var x = 4; x < 200; x += 8) { if (Math.sin(x * .09 + y * .07) + Math.cos(x * .05 - y * .11) > .35) dots += '<circle cx="' + x + '" cy="' + y + '" r="1.8"/>'; }
+    var paths = ['M 300 270 Q 200 80 90 170', 'M 300 270 Q 420 90 440 200', 'M 330 245 Q 300 420 140 380', 'M 330 245 Q 470 330 400 430'];
+    var pk = ['p12', 'p2', 'p16', 'p9'];
+    return '<div class="globe" aria-hidden="true"><div class="globe-ring r2"></div><div class="globe-ring"></div><div class="globe-core"><svg viewBox="0 0 200 100" preserveAspectRatio="none"><g fill="rgba(74,44,26,.45)">' + dots + '</g></svg></div>' +
+      '<svg class="globe-arcs" viewBox="0 0 520 520">' + paths.map(function (d, i) {
+        return '<path d="' + d + '"/><image href="' + img(pk[i]) + '" width="50" height="50" x="-25" y="-25" opacity="0"><animateMotion dur="' + (4.6 + i * .9) + 's" begin="' + (i * 1.1) + 's" repeatCount="indefinite" path="' + d + '"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.85;1" dur="' + (4.6 + i * .9) + 's" begin="' + (i * 1.1) + 's" repeatCount="indefinite"/></image>';
+      }).join('') + '</svg>' +
+      '<span class="globe-pin" style="left:57.7%;top:51.9%"><span>' + (lang === 'ar' ? 'مصر' : 'Egypt') + '</span></span><span class="globe-pin" style="left:63.5%;top:47.1%"><span>' + (lang === 'ar' ? 'سوريا' : 'Syria') + '</span></span>' + '</div>';
+  }
+
+  function exportSec(full) {
+    var E = C.export;
+    return '<section class="export crimp-tb"><span class="drift" data-speed=".6" style="left:4%;top:12%;--s:48px">' + ico('d-wheat') + '</span><span class="drift" data-speed="1" style="right:46%;bottom:10%;--s:40px">' + ico('d-biscuit') + '</span>' +
+      '<div class="wrap export-grid"><div><h2>' + esc(L(E, 'title')) + '</h2><p class="lead">' + esc(L(E, 'text')) + '</p>' +
+      '<div class="ex-points" data-stagger>' + E.points.map(function (x) { return '<div class="ex-point" data-reveal>' + badge('i-' + x.icon) + '<div><h3>' + esc(L(x, 't')) + '</h3><p>' + esc(L(x, 'd')) + '</p></div></div>'; }).join('') + '</div>' +
+      '<div class="ex-actions"><a class="btn btn-gold" href="' + (full ? '#export-form' : '#export') + '">' + esc(L(E, 'btn')) + ico('i-arrow', 'ico-dir') + '</a><a class="btn btn-ghost" href="' + WA + '" target="_blank" rel="noopener">' + ico('i-whatsapp') + t('chat') + '</a></div></div>' +
+      globe() + '</div></section>';
   }
 
   function productsHome() {
@@ -179,7 +221,7 @@
         var n = list.filter(function (p) { return p.cat === c.key; }).length;
         return n ? '<button class="chip" type="button" data-f="' + c.slug + '" aria-pressed="false">' + esc(L(c, 'name')) + '<span class="n">' + n + '</span></button>' : '';
       }).join('');
-    return '<section class="section" id="home-products"><div class="wrap"><header class="sec-head"><h2>' + esc(L(C.home, 'products_title')) + '</h2><p>' + esc(L(C.home, 'products_text')) + '</p></header>' +
+    return '<section class="section" id="home-products"><span class="drift" data-speed="1" style="right:2%;top:40%;--s:40px">' + ico('d-choc') + '</span><span class="drift" data-speed=".7" style="left:3%;bottom:10%;--s:44px">' + ico('d-hazel') + '</span><div class="wrap"><header class="sec-head"><h2>' + esc(L(C.home, 'products_title')) + '</h2><p>' + esc(L(C.home, 'products_text')) + '</p></header>' +
       '<div class="chips" data-filter="#home-grid" role="group" aria-label="' + t('category') + '">' + chips + '</div>' +
       '<div class="p-grid" id="home-grid">' + list.map(card).join('') + '</div>' +
       '<div class="more-row"><a class="btn" href="#products">' + t('viewAll') + ico('i-arrow', 'ico-dir') + '</a></div></div></section>';
@@ -253,7 +295,14 @@
   }
 
   /* ---------- Views ---------- */
-  function vHome() { return hero() + ribbons() + promises() + cats() + productsHome() + roll() + aboutHome() + brands() + reviews() + factories() + cta(); }
+  function vHome() { return hero() + ribbons() + promises() + cats() + showcase() + productsHome() + roll() + exportSec() + aboutHome() + brands() + reviews() + factories() + cta(); }
+  function vExport() {
+    var E = C.export, subj = T[lang].subjects.slice(); subj.unshift(lang === 'ar' ? 'طلب تصدير' : 'Export request');
+    return pageHero(L(E, 'nav'), L(E, 'text'), [[L(E, 'nav')]], 'p12') + exportSec(true) +
+      '<section class="section"><div class="wrap"><header class="sec-head"><h2>' + esc(L(E, 'steps_title')) + '</h2></header><div class="ex-steps" data-stagger>' +
+      E.steps.map(function (x, i) { return '<div class="ex-step" data-reveal><b>' + (i + 1) + '</b><h3>' + esc(L(x, 't')) + '</h3><p>' + esc(L(x, 'd')) + '</p></div>'; }).join('') + '</div></div></section>' +
+      cats() + '<section class="section" id="export-form" style="padding-top:0"><div class="wrap" style="max-width:820px">' + formCard(subj) + '</div></section>';
+  }
 
   function vProducts(filterCat, filterBrand) {
     var c = filterCat ? C.categories.filter(function (x) { return x.slug === filterCat; })[0] : null;
@@ -300,6 +349,18 @@
       roll() + '<section class="section"><div class="wrap">' + stats().replace('class="stats"', 'class="stats" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr))"') + '</div></section>' + factories() + cta();
   }
 
+  function formCard(subjects) {
+    var subj = subjects.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
+    return '<div class="form-card" data-reveal><h2>' + t('formTitle') + '</h2><p>' + t('formText') + '</p>' +
+      '<form data-kk-contact novalidate data-msg-required="' + esc(t('required')) + '">' +
+      '<div class="f-row"><div class="field"><label for="f-name">' + t('fName') + ' <span class="req">*</span></label><input id="f-name" name="name" required autocomplete="name"></div>' +
+      '<div class="field"><label for="f-phone">' + t('fPhone') + ' <span class="req">*</span></label><input id="f-phone" name="phone" type="tel" required autocomplete="tel" dir="ltr"></div></div>' +
+      '<div class="f-row"><div class="field"><label for="f-email">' + t('fEmail') + ' ' + t('fOpt') + '</label><input id="f-email" name="email" type="email" autocomplete="email" dir="ltr"></div>' +
+      '<div class="field"><label for="f-subject">' + t('fSubject') + '</label><select id="f-subject" name="subject">' + subj + '</select></div></div>' +
+      '<div class="field"><label for="f-msg">' + t('fMsg') + ' <span class="req">*</span></label><textarea id="f-msg" name="message" required></textarea></div>' +
+      '<input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+      '<button class="btn" type="submit">' + t('send') + ico('i-arrow', 'ico-dir') + '</button><p class="form-status" role="status" aria-live="polite"></p></form></div>';
+  }
   function vContact() {
     var s = C.site;
     var subj = T[lang].subjects.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
@@ -331,6 +392,7 @@
     if (h === '' || h === 'home' || h === 'main') return ['home', vHome()];
     if (h === 'about') return ['about', vAbout()];
     if (h === 'contact') return ['contact', vContact()];
+    if (h === 'export' || h === 'export-form') return ['export', vExport()];
     if (h === 'products') return ['products', vProducts()];
     if (h.indexOf('cat-') === 0) return ['cat', vProducts(h.slice(4))];
     if (h.indexOf('brand-') === 0) return ['brand', vProducts(null, h.slice(6))];
@@ -345,7 +407,7 @@
     var html = document.documentElement;
     html.setAttribute('lang', lang === 'ar' ? 'ar' : 'en');
     html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-    var titles = { home: L(C.site, 'name') + ' | ' + L(C.site, 'tagline'), about: t('about'), contact: t('contact'), products: t('products'), cat: t('products'), brand: t('brands'), product: t('products'), '404': '404' };
+    var titles = { export: L(C.export, 'nav'), home: L(C.site, 'name') + ' | ' + L(C.site, 'tagline'), about: t('about'), contact: t('contact'), products: t('products'), cat: t('products'), brand: t('brands'), product: t('products'), '404': '404' };
     document.title = (r[0] === 'home' ? '' : titles[r[0]] + ' | ') + (r[0] === 'home' ? titles.home : L(C.site, 'name'));
     var app = document.getElementById('app');
     var keepIntro = !lastRoute;

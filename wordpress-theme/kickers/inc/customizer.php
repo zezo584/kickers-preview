@@ -64,6 +64,8 @@ function kk_customizer_map() {
 	$home = array(
 		'show_promises'  => array( 'إظهار قسم: وعد كيكرز (4 مميزات)', 'checkbox' ),
 		'show_cats'      => array( 'إظهار قسم: التصنيفات', 'checkbox' ),
+		'show_showcase'  => array( 'إظهار قسم: تشكيلة كيكرز (العرض الدوّار للمنتجات)', 'checkbox' ),
+		'show_export'    => array( 'إظهار قسم: التصدير', 'checkbox' ),
 		'show_products'  => array( 'إظهار قسم: منتجاتنا', 'checkbox' ),
 		'show_roll'      => array( 'إظهار قسم: من حبة القمح لحد إيدك', 'checkbox' ),
 		'show_about'     => array( 'إظهار قسم: من نحن + الأرقام', 'checkbox' ),
@@ -106,6 +108,25 @@ function kk_customizer_map() {
 		'cta_text'  => array( 'البانر الأخير — النص', 'ar_en_area' ),
 	);
 	$map['kk_home'] = array( 'title' => 'الصفحة الرئيسية', 'fields' => $home );
+
+	$exp = array(
+		'export_nav'         => array( 'اسم القسم في القائمة', 'ar_en' ),
+		'export_title'       => array( 'العنوان', 'ar_en' ),
+		'export_text'        => array( 'النص', 'ar_en_area' ),
+		'export_btn'         => array( 'نص الزرار', 'ar_en' ),
+		'export_steps_title' => array( 'عنوان خطوات الاستيراد (صفحة التصدير)', 'ar_en' ),
+		'showcase_title'     => array( 'تشكيلة كيكرز — العنوان', 'ar_en' ),
+		'showcase_text'      => array( 'تشكيلة كيكرز — الوصف', 'ar_en' ),
+	);
+	for ( $i = 1; $i <= 4; $i++ ) {
+		$exp[ 'export_point' . $i . '_t' ] = array( 'ميزة تصدير ' . $i . ' — العنوان', 'ar_en' );
+		$exp[ 'export_point' . $i . '_d' ] = array( 'ميزة تصدير ' . $i . ' — الوصف', 'ar_en_area' );
+	}
+	for ( $i = 1; $i <= 4; $i++ ) {
+		$exp[ 'export_step' . $i . '_t' ] = array( 'خطوة ' . $i . ' — العنوان', 'ar_en' );
+		$exp[ 'export_step' . $i . '_d' ] = array( 'خطوة ' . $i . ' — الوصف', 'ar_en_area' );
+	}
+	$map['kk_export'] = array( 'title' => 'التصدير وتشكيلة المنتجات', 'fields' => $exp );
 
 	$map['kk_about'] = array(
 		'title'       => 'صفحة من نحن',

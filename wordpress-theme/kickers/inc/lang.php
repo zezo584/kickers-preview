@@ -247,6 +247,10 @@ function kk_strings() {
 		'read_more'     => array( 'اقرأ المزيد', 'Read more' ),
 		'breadcrumb'    => array( 'مسار التنقل', 'Breadcrumb' ),
 		'news'          => array( 'الأخبار', 'News' ),
+		'export'        => array( 'التصدير', 'Export' ),
+		'quick'         => array( 'عرض سريع', 'Quick view' ),
+		'details'       => array( 'تفاصيل المنتج', 'Product details' ),
+		'export_subj'   => array( 'طلب تصدير', 'Export request' ),
 	);
 	return $s;
 }

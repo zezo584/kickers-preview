@@ -16,6 +16,7 @@ $kk_name = kk_site_name();
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+<div class="progress" data-progress aria-hidden="true"></div>
 <a class="skip-link" href="#main"><?php echo esc_html( kk_t( 'skip' ) ); ?></a>
 <?php if ( is_front_page() ) : ?>
 <div class="intro crimp-b" data-intro aria-hidden="true"><div class="intro-logo-wrap"><img class="intro-logo" src="<?php echo esc_url( kk_logo_url() ); ?>" alt="" width="241" height="120"></div></div>

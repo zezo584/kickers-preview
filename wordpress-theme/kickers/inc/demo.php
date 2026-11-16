@@ -59,7 +59,7 @@ function kk_setup_page() {
 	$checks = array(
 		'kk_products' => 'التصنيفات (4) والعلامات التجارية (6) والمنتجات (17) بصورها',
 		'kk_slides'   => 'بانرات السلايدر الرئيسية (4)',
-		'kk_pages'    => 'صفحات "من نحن" و"تواصل معنا" (لو موجودة بنفس الرابط: about و contact هيتطبق عليها تصميم القالب)',
+		'kk_pages'    => 'صفحات "من نحن" و"التصدير" و"تواصل معنا" (لو موجودة بنفس الرابط: about و contact هيتطبق عليها تصميم القالب)',
 		'kk_icon'     => 'أيقونة الموقع (Favicon) = شعار كيكرز',
 		'kk_front'    => 'الصفحة الرئيسية = تصميم القالب (يلغي صفحة Elementor الرئيسية القديمة من العرض بدون ما يمسحها)',
 	);
@@ -273,6 +273,7 @@ function kk_run_import( $o ) {
 		$pages = array(
 			'about'   => array( 'من نحن', 'About us', 'page-about.php' ),
 			'contact' => array( 'تواصل معنا', 'Contact us', 'page-contact.php' ),
+			'export'  => array( 'التصدير', 'Export', 'page-export.php' ),
 		);
 		foreach ( $pages as $slug => $pg ) {
 			$p = get_page_by_path( $slug );
@@ -296,7 +297,7 @@ function kk_run_import( $o ) {
 				update_post_meta( $id, '_kk_title_en', $pg[1] );
 			}
 		}
-		$log[] = 'صفحات من نحن وتواصل معنا جاهزة.';
+		$log[] = 'صفحات من نحن والتصدير وتواصل معنا جاهزة.';
 	}
 
 	if ( $o['icon'] ) {

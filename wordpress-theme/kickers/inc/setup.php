@@ -179,6 +179,7 @@ function kk_nav_items() {
 		'current' => is_post_type_archive( 'kk_product' ) || is_singular( 'kk_product' ) || is_tax( array( 'kk_product_cat', 'kk_brand' ) ),
 		'sub'     => $sub,
 	);
+	$items[] = array( 'label' => kk_t( 'export' ), 'url' => kk_page_url( 'export' ), 'current' => is_page( 'export' ) );
 	$items[] = array( 'label' => kk_t( 'contact' ), 'url' => kk_page_url( 'contact' ), 'current' => is_page( 'contact' ) );
 	return $items;
 }

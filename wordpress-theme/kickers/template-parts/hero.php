@@ -11,6 +11,12 @@ if ( ! $kk_slides ) {
 	return;
 }
 $kk_n     = count( $kk_slides );
+$kk_sprinkles = '<div class="sprinkles" aria-hidden="true">';
+$kk_cols      = array( '#FFC928', '#fff', '#FF8FA0', '#7A4A2D', '#FFE27F' );
+for ( $kk_j = 0; $kk_j < 16; $kk_j++ ) {
+	$kk_sprinkles .= '<i style="--x:' . ( ( $kk_j * 37 ) % 100 ) . '%;--c:' . $kk_cols[ $kk_j % 5 ] . ';--t:' . ( 7 + ( $kk_j % 5 ) * 1.6 ) . 's;--dl:' . ( -$kk_j * 1.1 ) . 's"></i>';
+}
+$kk_sprinkles .= '</div>';
 $kk_waves = '<div class="slide-bg" aria-hidden="true"><svg viewBox="0 0 1440 500" preserveAspectRatio="none"><path class="wave-a" d="M0,170 C240,90 420,260 720,170 C1000,85 1180,230 1440,140 L1440,500 L0,500 Z"/><path class="wave-b" d="M0,280 C300,200 520,360 860,270 C1100,205 1280,320 1440,250 L1440,500 L0,500 Z"/></svg></div>';
 ?>
 <section class="hero" data-hero data-duration="<?php echo esc_attr( max( 3, (int) kk_opt( 'hero_duration' ) ) ); ?>" data-autoplay="<?php echo kk_opt( 'hero_autoplay' ) ? '1' : '0'; ?>" aria-roledescription="carousel" aria-label="<?php echo esc_attr( kk_t( 'hero_label' ) ); ?>">
@@ -41,7 +47,7 @@ $kk_waves = '<div class="slide-bg" aria-hidden="true"><svg viewBox="0 0 1440 500
 					if ( $kk_s['photo'] ) {
 						echo wp_get_attachment_image( $kk_s['photo'], 'full', false, array( 'class' => 'slide-photo', 'alt' => '', 'loading' => 0 === $kk_i ? 'eager' : 'lazy' ) );
 					}
-					echo $kk_waves; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+					echo $kk_waves . $kk_sprinkles; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					if ( $kk_s['word'] ) {
 						echo '<div class="slide-word" aria-hidden="true">' . esc_html( $kk_s['word'] ) . '</div>';
 					}
