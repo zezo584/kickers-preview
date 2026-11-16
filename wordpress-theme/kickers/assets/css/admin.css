@@ -1,0 +1,16 @@
+.kk-intro{background:#FFF6E6;border-inline-start:4px solid #ED1C2E;padding:10px 14px;margin:6px 0 16px;border-radius:4px}
+.kk-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 22px;margin-bottom:10px}
+.kk-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:900px){.kk-grid,.kk-grid-3{grid-template-columns:1fr}}
+.kk-field{display:block;margin-bottom:12px}
+.kk-label{display:block;font-weight:600;margin-bottom:6px}
+.kk-help{display:block;color:#646970;font-size:12px;margin-top:4px}
+.kk-check{display:flex;align-items:center;gap:8px;font-weight:600;align-self:end}
+.kk-media-prev{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.kk-media-prev img{width:72px;height:72px;object-fit:contain;background:#f6f7f7;border:1px solid #dcdcde;border-radius:6px;padding:2px}
+.kk-panel{border:1px solid #dcdcde;border-radius:8px;padding:6px 16px 10px;margin-top:12px;background:#fff}
+.kk-panel h4{margin:10px 0 14px;font-size:14px}
+.kk-setup .card{max-width:860px;padding:20px 24px}
+.kk-setup .kk-steps li{margin-bottom:6px}
+.column-kk_thumb{width:70px}
+.column-kk_thumb img{width:56px;height:56px;object-fit:contain}
