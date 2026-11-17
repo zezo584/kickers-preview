@@ -28,8 +28,8 @@ add_action(
 			array(
 				'primary'    => 'القائمة الرئيسية (عربي)',
 				'primary_en' => 'Main menu (English)',
-				'footer'     => 'روابط الفوتر (عربي)',
-				'footer_en'  => 'Footer links (English)',
+				'primary_fr' => 'Menu principal (Français)',
+				'primary_de' => 'Hauptmenü (Deutsch)',
 			)
 		);
 		add_image_size( 'kk-product', 640, 640, false );
@@ -59,6 +59,7 @@ add_action(
 					'sent'     => kk_t( 'sent' ),
 					'error'    => kk_t( 'error' ),
 				),
+				'exportBase' => kk_page_url( 'export' ),
 			)
 		);
 		if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
@@ -161,31 +162,33 @@ add_filter(
  * Header navigation: uses the assigned WordPress menu for the current language, or a smart default.
  */
 function kk_nav_items() {
-	$items  = array();
-	$cats   = kk_categories();
-	$sub    = array();
-	foreach ( $cats as $c ) {
-		$sub[] = array(
-			'label' => kk_term_name( $c ),
-			'url'   => get_term_link( $c ),
-			'color' => kk_term_meta( $c, 'color', '#ED1C2E' ),
-		);
+	$sub = array();
+	foreach ( kk_categories() as $c ) {
+		$sub[] = array( 'label' => kk_term_name( $c ), 'url' => get_term_link( $c ), 'color' => kk_term_meta( $c, 'color', '#ED1C2E' ) );
 	}
-	$items[] = array( 'label' => kk_t( 'home' ), 'url' => home_url( '/' ), 'current' => is_front_page() );
-	$items[] = array( 'label' => kk_t( 'about' ), 'url' => kk_page_url( 'about' ), 'current' => is_page( 'about' ) );
-	$items[] = array(
-		'label'   => kk_t( 'products' ),
-		'url'     => kk_products_url(),
-		'current' => is_post_type_archive( 'kk_product' ) || is_singular( 'kk_product' ) || is_tax( array( 'kk_product_cat', 'kk_brand' ) ),
-		'sub'     => $sub,
+	return array(
+		array( 'label' => kk_t( 'home' ), 'url' => home_url( '/' ), 'current' => is_front_page() ),
+		array( 'label' => kk_t( 'about' ), 'url' => kk_page_url( 'about' ), 'current' => is_page( 'about' ) ),
+		array( 'label' => kk_t( 'products' ), 'url' => kk_products_url(), 'current' => is_post_type_archive( 'kk_product' ) || is_singular( 'kk_product' ) || is_tax( array( 'kk_product_cat', 'kk_brand' ) ), 'sub' => $sub ),
+		array( 'label' => kk_t( 'export' ), 'url' => kk_page_url( 'export' ), 'current' => is_page( 'export' ) ),
+		array( 'label' => kk_t( 'agent' ), 'url' => kk_page_url( 'agent' ), 'current' => is_page( 'agent' ) ),
+		array( 'label' => kk_t( 'reviews' ), 'url' => kk_page_url( 'reviews' ), 'current' => is_page( 'reviews' ) ),
+		array( 'label' => kk_t( 'contact' ), 'url' => kk_page_url( 'contact' ), 'current' => is_page( 'contact' ) ),
 	);
-	$items[] = array( 'label' => kk_t( 'export' ), 'url' => kk_page_url( 'export' ), 'current' => is_page( 'export' ) );
-	$items[] = array( 'label' => kk_t( 'contact' ), 'url' => kk_page_url( 'contact' ), 'current' => is_page( 'contact' ) );
-	return $items;
+}
+
+/** Language dropdown. */
+function kk_lang_menu() {
+	$cur = kk_lang();
+	echo '<div class="lang-dd" data-lang-dd><button class="lang-switch" type="button" aria-haspopup="true" aria-expanded="false" aria-label="' . esc_attr( kk_t( 'language' ) ) . '">' . kk_ico( 'i-globe' ) . '<span>' . esc_html( strtoupper( $cur ) ) . '</span>' . kk_ico( 'i-down', 'dd-caret' ) . '</button><ul class="lang-list">'; // phpcs:ignore
+	foreach ( kk_langs() as $code => $l ) {
+		echo '<li><a href="' . esc_url( kk_switch_url( $code ) ) . '" hreflang="' . esc_attr( $code ) . '" lang="' . esc_attr( $code ) . '"' . ( $code === $cur ? ' aria-current="true"' : '' ) . '><b>' . esc_html( strtoupper( $code ) ) . '</b>' . esc_html( $l['name'] ) . '</a></li>';
+	}
+	echo '</ul></div>';
 }
 
 function kk_menu_location() {
-	return kk_is_en() ? 'primary_en' : 'primary';
+	return kk_is_ar() ? 'primary' : 'primary_' . kk_lang();
 }
 
 function kk_render_nav( $drawer = false ) {
@@ -213,7 +216,7 @@ function kk_render_nav( $drawer = false ) {
 				}
 				echo '<li><a href="' . esc_url( $s['url'] ) . '"><span class="dot" style="--c:' . esc_attr( $s['color'] ) . '"></span>' . esc_html( $s['label'] ) . '</a></li>';
 			}
-			echo '<li><a href="' . esc_url( kk_products_url() ) . '"><span class="dot" style="--c:#4A2C1A"></span>' . esc_html( kk_t( 'view_all' ) ) . '</a></li></ul></li>';
+			echo '<li><a href="' . esc_url( kk_products_url() ) . '"><span class="dot" style="--c:#4A2C1A"></span>' . esc_html( kk_t( 'viewAll' ) ) . '</a></li></ul></li>';
 		} else {
 			echo '<li><a href="' . esc_url( $it['url'] ) . '"' . $cur . '>' . esc_html( $it['label'] ) . '</a></li>'; // phpcs:ignore
 		}

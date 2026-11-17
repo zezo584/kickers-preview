@@ -3,8 +3,8 @@ defined( 'ABSPATH' ) || exit;
 if ( ! kk_opt( 'show_cta' ) ) {
 	return;
 }
-$kk_a = kk_asset( 'img/products/p12.webp' );
-$kk_b = kk_asset( 'img/products/p4.webp' );
+$kk_a = kk_asset( 'img/p2/spread-1.webp' );
+$kk_b = kk_asset( 'img/p2/dipped-5.webp' );
 ?>
 <section class="cta-band crimp-tb">
 	<img class="float-p fp-1" src="<?php echo esc_url( $kk_a ); ?>" alt="" loading="lazy">
@@ -16,7 +16,7 @@ $kk_b = kk_asset( 'img/products/p4.webp' );
 		<p><?php echo esc_html( kk_optl( 'cta_text' ) ); ?></p>
 		<div class="cta-actions">
 			<a class="btn btn-cream" href="<?php echo esc_url( kk_products_url() ); ?>"><?php echo esc_html( kk_t( 'browse' ) ); ?><?php echo kk_arrow(); // phpcs:ignore ?></a>
-			<a class="btn btn-ghost" href="<?php echo esc_url( kk_wa_url() ); ?>" target="_blank" rel="noopener"><?php echo kk_ico( 'i-whatsapp' ); // phpcs:ignore ?><?php echo esc_html( kk_t( 'chat' ) ); ?></a>
+			<a class="btn btn-ghost" href="<?php echo esc_url( kk_page_url( 'agent' ) ); ?>"><?php echo esc_html( kk_t( 'agent' ) ); ?></a>
 		</div>
 	</div>
 </section>

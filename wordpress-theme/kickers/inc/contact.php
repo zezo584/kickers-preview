@@ -53,6 +53,9 @@ function kk_contact_handler() {
 
 	$name    = isset( $_POST['name'] ) ? sanitize_text_field( wp_unslash( $_POST['name'] ) ) : '';
 	$phone   = isset( $_POST['phone'] ) ? sanitize_text_field( wp_unslash( $_POST['phone'] ) ) : '';
+	if ( isset( $_POST['kind'] ) && 'review' === $_POST['kind'] && '' === $phone ) { // phpcs:ignore
+		$phone = '-';
+	}
 	$email   = isset( $_POST['email'] ) ? sanitize_email( wp_unslash( $_POST['email'] ) ) : '';
 	$subject = isset( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : '';
 	$message = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
@@ -60,11 +63,32 @@ function kk_contact_handler() {
 	if ( '' === $name || '' === $phone || '' === $message ) {
 		wp_send_json_error( array( 'message' => kk_t( 'required' ) ), 400 );
 	}
+	$extra = array();
+	foreach ( array( 'company' => 'الشركة', 'country' => 'الدولة', 'city' => 'المدينة', 'activity' => 'النشاط' ) as $f => $label ) {
+		if ( ! empty( $_POST[ $f ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$extra[ $f ] = sanitize_text_field( wp_unslash( $_POST[ $f ] ) ); // phpcs:ignore
+			$message     = $label . ': ' . $extra[ $f ] . "\n" . $message;
+		}
+	}
+	// Customer review → pending review for moderation.
+	if ( isset( $_POST['kind'] ) && 'review' === $_POST['kind'] ) { // phpcs:ignore
+		$rating = isset( $_POST['rating'] ) ? max( 1, min( 5, absint( $_POST['rating'] ) ) ) : 5; // phpcs:ignore
+		$id     = wp_insert_post( array( 'post_type' => 'kk_review', 'post_status' => 'pending', 'post_title' => $name, 'post_content' => sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) ) ); // phpcs:ignore
+		if ( $id && ! is_wp_error( $id ) ) {
+			update_post_meta( $id, '_kk_rating', (string) $rating );
+			if ( ! empty( $extra['city'] ) ) {
+				update_post_meta( $id, '_kk_city', $extra['city'] );
+			}
+		}
+		$to = kk_opt( 'form_email' ) ? kk_opt( 'form_email' ) : get_option( 'admin_email' );
+		wp_mail( $to, '[' . kk_opt( 'site_name_ar' ) . '] رأي جديد من ' . $name . ' (' . $rating . '/5)', $message . "\n\n" . admin_url( 'edit.php?post_type=kk_review&post_status=pending' ) );
+		wp_send_json_success( array( 'message' => kk_t( 'review_sent' ) ) );
+	}
 
 	$body  = "الاسم: {$name}\nالموبايل: {$phone}\n";
 	$body .= $email ? "الإيميل: {$email}\n" : '';
 	$body .= $subject ? "نوع الطلب: {$subject}\n" : '';
-	$body .= 'اللغة: ' . ( kk_is_en() ? 'English' : 'عربي' ) . "\n\n{$message}\n";
+	$body .= 'اللغة: ' . kk_lang() . "\n\n{$message}\n";
 
 	wp_insert_post(
 		array(

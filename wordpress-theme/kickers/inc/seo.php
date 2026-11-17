@@ -51,7 +51,7 @@ function kk_seo_description() {
 		return $d ? $d : kk_optl( 'meta_desc' );
 	}
 	if ( is_post_type_archive( 'kk_product' ) ) {
-		return kk_t( 'products_lead' ) . ' ' . kk_optl( 'meta_desc' );
+		return kk_t( 'productsLead' ) . ' ' . kk_optl( 'meta_desc' );
 	}
 	return kk_optl( 'meta_desc' );
 }
@@ -125,8 +125,9 @@ add_action(
 			$img   = kk_og_image();
 			$title = wp_get_document_title();
 			echo '<meta property="og:site_name" content="' . esc_attr( kk_site_name() ) . '">' . "\n";
-			echo '<meta property="og:locale" content="' . ( kk_is_en() ? 'en_US' : 'ar_EG' ) . '">' . "\n";
-			echo '<meta property="og:locale:alternate" content="' . ( kk_is_en() ? 'ar_EG' : 'en_US' ) . '">' . "\n";
+			foreach ( kk_langs() as $kk_code => $kk_l ) {
+				echo '<meta property="' . ( kk_lang() === $kk_code ? 'og:locale' : 'og:locale:alternate' ) . '" content="' . esc_attr( $kk_l['og'] ) . '">' . "\n";
+			}
 			echo '<meta property="og:type" content="' . ( is_singular( 'kk_product' ) ? 'product' : ( is_singular( 'post' ) ? 'article' : 'website' ) ) . '">' . "\n";
 			echo '<meta property="og:title" content="' . esc_attr( $title ) . '">' . "\n";
 			if ( $desc ) {
@@ -138,17 +139,16 @@ add_action(
 				echo '<meta property="og:image:width" content="' . (int) $img[1] . '"><meta property="og:image:height" content="' . (int) $img[2] . '">' . "\n";
 			}
 			echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
-		} elseif ( $canonical && ( defined( 'SURERANK_VERSION' ) || class_exists( 'SureRank\\Inc\\Loader' ) ) && kk_is_en() ) {
+		} elseif ( $canonical && ( defined( 'SURERANK_VERSION' ) || class_exists( 'SureRank\\Inc\\Loader' ) ) && ! kk_is_ar() ) {
 			echo '<link rel="canonical" href="' . esc_url( $canonical ) . '">' . "\n";
 		}
 
 		// hreflang alternates (always — SEO plugins don't know about /en/).
 		if ( $canonical ) {
-			$ar = kk_url_to_lang( $canonical, 'ar' );
-			$en = kk_url_to_lang( $canonical, 'en' );
-			echo '<link rel="alternate" hreflang="ar" href="' . esc_url( $ar ) . '">' . "\n";
-			echo '<link rel="alternate" hreflang="en" href="' . esc_url( $en ) . '">' . "\n";
-			echo '<link rel="alternate" hreflang="x-default" href="' . esc_url( $ar ) . '">' . "\n";
+			foreach ( kk_lang_codes() as $kk_code ) {
+				echo '<link rel="alternate" hreflang="' . esc_attr( $kk_code ) . '" href="' . esc_url( kk_url_to_lang( $canonical, $kk_code ) ) . '">' . "\n";
+			}
+			echo '<link rel="alternate" hreflang="x-default" href="' . esc_url( kk_url_to_lang( $canonical, 'ar' ) ) . '">' . "\n";
 		}
 
 		kk_jsonld();
@@ -211,7 +211,7 @@ function kk_jsonld() {
 			'@type'         => 'Organization',
 			'@id'           => $org,
 			'name'          => kk_site_name(),
-			'alternateName' => kk_is_en() ? kk_opt( 'site_name_ar' ) : kk_opt( 'site_name_en' ),
+			'alternateName' => kk_is_ar() ? kk_opt( 'site_name_en' ) : kk_opt( 'site_name_ar' ),
 			'legalName'     => kk_optl( 'tagline' ),
 			'url'           => $home,
 			'logo'          => array(
@@ -229,7 +229,7 @@ function kk_jsonld() {
 		'@id'        => $home . '#website',
 		'url'        => $home,
 		'name'       => kk_site_name(),
-		'inLanguage' => kk_is_en() ? 'en' : 'ar',
+		'inLanguage' => kk_lang(),
 		'publisher'  => array( '@id' => $org ),
 	);
 
@@ -258,6 +258,15 @@ function kk_jsonld() {
 			$product['category'] = kk_term_name( $p['cat'] );
 		}
 		$w = get_post_meta( $p['id'], '_kk_weight_en', true );
+		if ( $p['variants'] ) {
+			$product['image'] = array();
+			foreach ( $p['variants'] as $v ) {
+				$u = kk_img_url( $v['id'], 'large' );
+				if ( $u ) {
+					$product['image'][] = $u;
+				}
+			}
+		}
 		if ( $w && preg_match( '/([\d.]+)\s*(kg|g)/i', $w, $m ) ) {
 			$product['weight'] = array(
 				'@type'    => 'QuantitativeValue',
@@ -345,18 +354,20 @@ add_action(
 		if ( ! class_exists( 'WP_Sitemaps_Provider' ) || ! function_exists( 'wp_register_sitemap_provider' ) ) {
 			return;
 		}
-		if ( ! class_exists( 'KK_Sitemap_English' ) ) {
+		if ( ! class_exists( 'KK_Sitemap_Lang' ) ) {
 			/**
-			 * /wp-sitemap-en-1.xml — every English URL.
+			 * /wp-sitemap-en-1.xml, -fr-, -de- : every translated URL.
 			 */
-			class KK_Sitemap_English extends WP_Sitemaps_Provider { // phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound,Generic.Classes.OpeningBraceSameLine.ContentAfterBrace
-				public function __construct() {
-					$this->name        = 'en';
-					$this->object_type = 'en';
+			class KK_Sitemap_Lang extends WP_Sitemaps_Provider { // phpcs:ignore
+				public $lang = 'en';
+				public function __construct( $lang ) {
+					$this->lang        = $lang;
+					$this->name        = $lang;
+					$this->object_type = $lang;
 				}
 				public function get_url_list( $page_num, $object_subtype = '' ) {
-					$urls   = array( array( 'loc' => kk_url_to_lang( home_url( '/' ), 'en' ) ) );
-					$urls[] = array( 'loc' => kk_url_to_lang( kk_products_url(), 'en' ) );
+					$urls   = array( array( 'loc' => kk_url_to_lang( home_url( '/' ), $this->lang ) ) );
+					$urls[] = array( 'loc' => kk_url_to_lang( kk_products_url(), $this->lang ) );
 					$posts  = get_posts(
 						array(
 							'post_type'      => array( 'page', 'kk_product' ),
@@ -371,7 +382,7 @@ add_action(
 							continue;
 						}
 						$urls[] = array(
-							'loc'     => kk_url_to_lang( get_permalink( $p ), 'en' ),
+							'loc'     => kk_url_to_lang( get_permalink( $p ), $this->lang ),
 							'lastmod' => get_post_modified_time( 'c', true, $p ),
 						);
 					}
@@ -383,7 +394,7 @@ add_action(
 						foreach ( $terms as $t ) {
 							$l = get_term_link( $t );
 							if ( ! is_wp_error( $l ) ) {
-								$urls[] = array( 'loc' => kk_url_to_lang( $l, 'en' ) );
+								$urls[] = array( 'loc' => kk_url_to_lang( $l, $this->lang ) );
 							}
 						}
 					}
@@ -394,7 +405,9 @@ add_action(
 				}
 			}
 		}
-		wp_register_sitemap_provider( 'en', new KK_Sitemap_English() );
+		foreach ( array( 'en', 'fr', 'de' ) as $kk_l ) {
+			wp_register_sitemap_provider( $kk_l, new KK_Sitemap_Lang( $kk_l ) );
+		}
 	}
 );
 
@@ -408,7 +421,8 @@ function kk_old_url_map() {
 			'بسكويت-محشو' => array( 'cat', 'sandwich-biscuits' ),
 			'بسكويت-مغطس' => array( 'cat', 'chocolate-coated-biscuits' ),
 			'بسكويت-سادة' => array( 'cat', 'plain-biscuits' ),
-			'تيلا'        => array( 'cat', 'tella-spreads' ),
+			'تيلا'        => array( 'cat', 'chocolate-spreads' ),
+			'tella-spreads' => array( 'cat', 'chocolate-spreads' ),
 			'home'        => array( 'home' ),
 		)
 	);

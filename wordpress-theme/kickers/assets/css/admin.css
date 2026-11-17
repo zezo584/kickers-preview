@@ -14,3 +14,9 @@
 .kk-setup .kk-steps li{margin-bottom:6px}
 .column-kk_thumb{width:70px}
 .column-kk_thumb img{width:56px;height:56px;object-fit:contain}
+.kk-langs{margin-top:14px}
+.kk-lang{border:1px solid #dcdcde;border-radius:8px;margin-bottom:8px;background:#fff}
+.kk-lang summary{cursor:pointer;padding:10px 14px;font-weight:700;background:#f6f7f7;border-radius:8px}
+.kk-lang[open] summary{border-bottom:1px solid #dcdcde;border-radius:8px 8px 0 0}
+.kk-lang > .kk-grid,.kk-lang > .kk-field,.kk-lang > .wp-editor-wrap{padding:10px 14px}
+#kk_product_box h4{margin:18px 0 8px;font-size:14px;border-bottom:1px solid #eee;padding-bottom:6px}

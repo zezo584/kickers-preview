@@ -30,8 +30,8 @@ $kk_name = kk_site_name();
 			<?php kk_render_nav(); ?>
 		</nav>
 		<div class="header-actions">
-			<a class="lang-switch" href="<?php echo esc_url( kk_switch_url() ); ?>" hreflang="<?php echo kk_is_en() ? 'ar' : 'en'; ?>" lang="<?php echo kk_is_en() ? 'ar' : 'en'; ?>" aria-label="<?php echo esc_attr( kk_t( 'other_lang' ) ); ?>"><?php echo kk_ico( 'i-globe' ); // phpcs:ignore ?><span><?php echo esc_html( kk_t( 'other_code' ) ); ?></span></a>
-			<a class="btn btn-sm" href="<?php echo esc_url( kk_wa_url() ); ?>" target="_blank" rel="noopener"><?php echo kk_ico( 'i-whatsapp' ); // phpcs:ignore ?><?php echo esc_html( kk_t( 'whatsapp' ) ); ?></a>
+			<?php kk_lang_menu(); ?>
+			<a class="btn btn-sm btn-wa-h" href="<?php echo esc_url( kk_wa_url() ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( kk_t( 'whatsapp' ) ); ?>"><?php echo kk_ico( 'i-whatsapp' ); // phpcs:ignore ?></a>
 			<button class="menu-toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="drawer" aria-label="<?php echo esc_attr( kk_t( 'menu' ) ); ?>"><?php echo kk_ico( 'i-menu' ); // phpcs:ignore ?></button>
 		</div>
 	</div>
@@ -42,9 +42,9 @@ $kk_name = kk_site_name();
 		<button class="drawer-close" type="button" data-drawer-close aria-label="<?php echo esc_attr( kk_t( 'close' ) ); ?>"><?php echo kk_ico( 'i-close' ); // phpcs:ignore ?></button>
 	</div>
 	<nav class="drawer-nav"><?php kk_render_nav( true ); ?></nav>
+	<div class="drawer-langs"><?php foreach ( kk_langs() as $kk_c => $kk_l ) : ?><a href="<?php echo esc_url( kk_switch_url( $kk_c ) ); ?>" hreflang="<?php echo esc_attr( $kk_c ); ?>"<?php echo kk_lang() === $kk_c ? ' aria-current="true"' : ''; ?>><?php echo esc_html( $kk_l['name'] ); ?></a><?php endforeach; ?></div>
 	<div class="drawer-foot">
 		<a class="btn btn-cream" href="<?php echo esc_url( kk_wa_url() ); ?>" target="_blank" rel="noopener"><?php echo kk_ico( 'i-whatsapp' ); // phpcs:ignore ?><?php echo esc_html( kk_t( 'chat' ) ); ?></a>
-		<a class="lang-switch" href="<?php echo esc_url( kk_switch_url() ); ?>" hreflang="<?php echo kk_is_en() ? 'ar' : 'en'; ?>"><?php echo kk_ico( 'i-globe' ); // phpcs:ignore ?><?php echo esc_html( kk_t( 'other_lang' ) ); ?></a>
 	</div>
 </div>
 <main id="main" tabindex="-1">

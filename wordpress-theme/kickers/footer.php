@@ -7,7 +7,7 @@
 
 defined( 'ABSPATH' ) || exit;
 $kk_name = kk_site_name();
-$kk_loc  = kk_is_en() ? 'footer_en' : 'footer';
+$kk_loc  = 'footer_none';
 ?>
 </main>
 <footer class="site-footer crimp-t">
@@ -66,7 +66,7 @@ $kk_loc  = kk_is_en() ? 'footer_en' : 'footer';
 		</div>
 		<div class="f-bottom">
 			<span>© <span data-year><?php echo esc_html( gmdate( 'Y' ) ); ?></span> <?php echo esc_html( kk_optl( 'tagline' ) ); ?>. <?php echo esc_html( kk_t( 'rights' ) ); ?></span>
-			<span><?php echo esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ); ?></span>
+			<span class="f-langs"><?php foreach ( kk_langs() as $kk_c => $kk_l ) : ?><a href="<?php echo esc_url( kk_switch_url( $kk_c ) ); ?>" hreflang="<?php echo esc_attr( $kk_c ); ?>"><?php echo esc_html( $kk_l['name'] ); ?></a> <?php endforeach; ?></span>
 		</div>
 	</div>
 </footer>

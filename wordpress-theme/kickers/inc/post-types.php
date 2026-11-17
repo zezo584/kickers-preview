@@ -1,6 +1,6 @@
 <?php
 /**
- * Products, categories, brands and hero slides.
+ * Products, categories, brands, banners and reviews.
  *
  * @package Kickers
  */
@@ -20,13 +20,12 @@ add_action(
 					'add_new'            => 'أضف منتج',
 					'add_new_item'       => 'إضافة منتج جديد',
 					'edit_item'          => 'تعديل المنتج',
-					'new_item'           => 'منتج جديد',
 					'view_item'          => 'عرض المنتج',
 					'search_items'       => 'بحث في المنتجات',
 					'not_found'          => 'لا توجد منتجات',
 					'all_items'          => 'كل المنتجات',
-					'featured_image'     => 'صورة المنتج',
-					'set_featured_image' => 'اختيار صورة المنتج',
+					'featured_image'     => 'الصورة الرئيسية',
+					'set_featured_image' => 'اختيار الصورة الرئيسية',
 				),
 				'public'        => true,
 				'has_archive'   => 'products',
@@ -37,19 +36,11 @@ add_action(
 				'show_in_rest'  => false,
 			)
 		);
-
 		register_taxonomy(
 			'kk_product_cat',
 			'kk_product',
 			array(
-				'labels'            => array(
-					'name'          => 'تصنيفات المنتجات',
-					'singular_name' => 'تصنيف',
-					'menu_name'     => 'التصنيفات',
-					'add_new_item'  => 'إضافة تصنيف',
-					'edit_item'     => 'تعديل التصنيف',
-					'search_items'  => 'بحث في التصنيفات',
-				),
+				'labels'            => array( 'name' => 'أنواع المنتجات', 'singular_name' => 'نوع', 'menu_name' => 'الأنواع (سادة/محشو...)', 'add_new_item' => 'إضافة نوع', 'edit_item' => 'تعديل النوع' ),
 				'hierarchical'      => true,
 				'public'            => true,
 				'show_admin_column' => true,
@@ -57,19 +48,11 @@ add_action(
 				'show_in_rest'      => true,
 			)
 		);
-
 		register_taxonomy(
 			'kk_brand',
 			'kk_product',
 			array(
-				'labels'            => array(
-					'name'          => 'العلامات التجارية',
-					'singular_name' => 'علامة تجارية',
-					'menu_name'     => 'العلامات التجارية',
-					'add_new_item'  => 'إضافة علامة تجارية',
-					'edit_item'     => 'تعديل العلامة',
-					'search_items'  => 'بحث في العلامات',
-				),
+				'labels'            => array( 'name' => 'العلامات التجارية', 'singular_name' => 'علامة تجارية', 'menu_name' => 'العلامات التجارية', 'add_new_item' => 'إضافة علامة', 'edit_item' => 'تعديل العلامة' ),
 				'hierarchical'      => true,
 				'public'            => true,
 				'show_admin_column' => true,
@@ -77,25 +60,12 @@ add_action(
 				'show_in_rest'      => true,
 			)
 		);
-
 		register_post_type(
 			'kk_slide',
 			array(
-				'labels'              => array(
-					'name'               => 'بانرات السلايدر',
-					'singular_name'      => 'بانر',
-					'menu_name'          => 'بانرات السلايدر',
-					'add_new'            => 'أضف بانر',
-					'add_new_item'       => 'إضافة بانر جديد',
-					'edit_item'          => 'تعديل البانر',
-					'all_items'          => 'كل البانرات',
-					'not_found'          => 'لا توجد بانرات',
-					'featured_image'     => 'صورة خلفية (اختياري)',
-					'set_featured_image' => 'اختيار صورة خلفية',
-				),
+				'labels'              => array( 'name' => 'بانرات إضافية', 'singular_name' => 'بانر', 'menu_name' => 'بانرات إضافية', 'add_new' => 'أضف بانر', 'add_new_item' => 'إضافة بانر', 'edit_item' => 'تعديل البانر', 'all_items' => 'كل البانرات الإضافية', 'featured_image' => 'صورة خلفية (اختياري)', 'set_featured_image' => 'اختيار صورة خلفية' ),
 				'public'              => false,
 				'show_ui'             => true,
-				'show_in_menu'        => true,
 				'menu_icon'           => 'dashicons-images-alt2',
 				'menu_position'       => 6,
 				'supports'            => array( 'title', 'thumbnail', 'page-attributes' ),
@@ -103,10 +73,21 @@ add_action(
 				'show_in_rest'        => false,
 			)
 		);
+		register_post_type(
+			'kk_review',
+			array(
+				'labels'          => array( 'name' => 'آراء العملاء', 'singular_name' => 'رأي', 'menu_name' => 'آراء العملاء', 'add_new' => 'أضف رأي', 'add_new_item' => 'إضافة رأي', 'edit_item' => 'تعديل الرأي', 'all_items' => 'كل الآراء' ),
+				'public'          => false,
+				'show_ui'         => true,
+				'menu_icon'       => 'dashicons-star-filled',
+				'menu_position'   => 7,
+				'supports'        => array( 'title', 'editor', 'page-attributes' ),
+				'show_in_rest'    => false,
+			)
+		);
 	}
 );
 
-// Products archive: show everything, ordered like the admin (menu order).
 add_action(
 	'pre_get_posts',
 	function ( $q ) {
@@ -114,13 +95,12 @@ add_action(
 			return;
 		}
 		if ( $q->is_post_type_archive( 'kk_product' ) || $q->is_tax( array( 'kk_product_cat', 'kk_brand' ) ) ) {
-			$q->set( 'posts_per_page', 48 );
+			$q->set( 'posts_per_page', 60 );
 			$q->set( 'orderby', array( 'menu_order' => 'ASC', 'date' => 'DESC' ) );
 		}
 	}
 );
 
-// Flush rewrite rules once after the theme is (re)activated.
 add_action(
 	'after_switch_theme',
 	function () {
@@ -139,7 +119,10 @@ add_action(
 );
 
 /**
- * Normalised slides for the hero (from "بانرات السلايدر"; built-in defaults until the first one is added).
+ * Hero banners:
+ * 1) every product marked "جديد" gets its own animated banner,
+ * 2) every product type (category) gets a banner,
+ * 3) then any extra banners added under "بانرات إضافية".
  */
 function kk_get_slides() {
 	static $cache = null;
@@ -147,82 +130,144 @@ function kk_get_slides() {
 		return $cache;
 	}
 	$cache = array();
-	$posts = get_posts(
-		array(
-			'post_type'      => 'kk_slide',
-			'post_status'    => 'publish',
-			'posts_per_page' => 12,
-			'orderby'        => array( 'menu_order' => 'ASC', 'date' => 'DESC' ),
-		)
-	);
+	$wa    = kk_wa_url();
+
+	if ( kk_opt( 'hero_auto' ) ) {
+		$new = kk_query_products( array( 'posts_per_page' => 6, 'meta_key' => '_kk_new', 'meta_value' => '1' ) )->posts; // phpcs:ignore
+		$i   = 0;
+		foreach ( $new as $post ) {
+			$p    = kk_product( $post );
+			$imgs = array();
+			foreach ( array_slice( $p['variants'], 0, 3 ) as $v ) {
+				$imgs[] = array( 'id' => $v['id'], 'src' => kk_img_url( $v['id'], 'large' ) );
+			}
+			$theme   = get_post_meta( $p['id'], '_kk_banner_theme', true );
+			$cache[] = array(
+				'mode'   => 'design',
+				'new'    => true,
+				'theme'  => $theme ? $theme : ( $i % 2 ? 'red' : 'gold' ),
+				'word'   => 'NEW',
+				'title'  => kk_t( 'newPrefix' ) . wp_strip_all_tags( $p['title'] ),
+				'sub'    => kk_excerpt( $p['id'] ),
+				'btn1'   => kk_t( 'details' ),
+				'btn1_url' => $p['url'],
+				'btn2'   => kk_t( 'chat' ),
+				'btn2_url' => $wa,
+				'images' => $imgs,
+				'decor'  => $p['cat'] ? kk_term_meta( $p['cat'], 'banner_decor', 'biscuit' ) : 'biscuit',
+				'label'  => wp_strip_all_tags( $p['title'] ),
+				'photo'  => 0,
+			);
+			++$i;
+		}
+		foreach ( kk_categories() as $c ) {
+			if ( '0' === (string) kk_term_meta( $c, 'banner_show', '1' ) ) {
+				continue;
+			}
+			$imgs  = array();
+			$posts = kk_cat_products( $c, 6 );
+			foreach ( $posts as $post ) {
+				$v = kk_variants( $post->ID );
+				if ( $v && count( $imgs ) < 3 ) {
+					$imgs[] = array( 'id' => $v[0]['id'], 'src' => kk_img_url( $v[0]['id'], 'large' ) );
+				}
+			}
+			foreach ( $posts as $post ) {
+				foreach ( array_slice( kk_variants( $post->ID ), 1 ) as $v ) {
+					if ( count( $imgs ) < 3 ) {
+						$imgs[] = array( 'id' => $v['id'], 'src' => kk_img_url( $v['id'], 'large' ) );
+					}
+				}
+			}
+			$title   = kk_term_ml( $c, 'banner_title' );
+			$cache[] = array(
+				'mode'     => 'design',
+				'new'      => false,
+				'theme'    => kk_term_meta( $c, 'banner_theme', 'red' ),
+				'word'     => kk_term_meta( $c, 'banner_word', '' ),
+				'title'    => $title ? $title : kk_term_name( $c ),
+				'sub'      => kk_term_ml( $c, 'banner_sub' ) ? kk_term_ml( $c, 'banner_sub' ) : kk_term_desc( $c ),
+				'btn1'     => kk_t( 'browse' ),
+				'btn1_url' => get_term_link( $c ),
+				'btn2'     => kk_t( 'chat' ),
+				'btn2_url' => $wa,
+				'images'   => $imgs,
+				'decor'    => kk_term_meta( $c, 'banner_decor', 'wheat' ),
+				'label'    => kk_term_name( $c ),
+				'photo'    => (int) kk_term_meta( $c, 'banner_photo', 0 ),
+			);
+		}
+	}
+
+	$posts = get_posts( array( 'post_type' => 'kk_slide', 'post_status' => 'publish', 'posts_per_page' => 12, 'orderby' => array( 'menu_order' => 'ASC', 'date' => 'DESC' ) ) );
 	foreach ( $posts as $p ) {
 		$m    = function ( $k ) use ( $p ) {
 			return get_post_meta( $p->ID, '_kk_' . $k, true );
 		};
-		$lang = function ( $k ) use ( $p ) {
-			return kk_meta( $p->ID, $k );
-		};
 		$imgs = array();
 		foreach ( array( 'img1', 'img2', 'img3' ) as $k ) {
 			$id = (int) $m( $k );
-			if ( $id ) {
-				$src = wp_get_attachment_image_url( $id, 'large' );
-				if ( $src ) {
-					$imgs[] = array( 'id' => $id, 'src' => $src );
-				}
+			if ( $id && kk_img_url( $id, 'large' ) ) {
+				$imgs[] = array( 'id' => $id, 'src' => kk_img_url( $id, 'large' ) );
 			}
 		}
-		$title    = kk_is_en() && $m( 'title_en' ) ? $m( 'title_en' ) : $p->post_title;
+		$title   = get_the_title( $p );
 		$cache[] = array(
 			'mode'       => $m( 'mode' ) ? $m( 'mode' ) : 'design',
+			'new'        => '1' === $m( 'is_new' ),
 			'theme'      => $m( 'theme' ) ? $m( 'theme' ) : 'red',
 			'word'       => $m( 'word' ),
 			'title'      => $title,
-			'sub'        => $lang( 'sub' ),
-			'btn1'       => $lang( 'btn1' ),
+			'sub'        => kk_meta( $p->ID, 'sub' ),
+			'btn1'       => kk_meta( $p->ID, 'btn1' ),
 			'btn1_url'   => kk_resolve_link( $m( 'btn1_url' ) ),
-			'btn2'       => $lang( 'btn2' ),
+			'btn2'       => kk_meta( $p->ID, 'btn2' ),
 			'btn2_url'   => kk_resolve_link( $m( 'btn2_url' ) ? $m( 'btn2_url' ) : 'whatsapp' ),
 			'images'     => $imgs,
 			'decor'      => $m( 'decor' ) ? $m( 'decor' ) : 'wheat',
-			'label'      => $lang( 'label' ) ? $lang( 'label' ) : $title,
+			'label'      => kk_meta( $p->ID, 'label' ) ? kk_meta( $p->ID, 'label' ) : $title,
 			'photo'      => get_post_thumbnail_id( $p->ID ),
 			'banner'     => (int) $m( 'banner' ),
 			'banner_m'   => (int) $m( 'banner_m' ),
 			'banner_url' => $m( 'banner_url' ) ? kk_resolve_link( $m( 'banner_url' ) ) : '',
-			'banner_alt' => $title,
 		);
 	}
+
 	if ( empty( $cache ) ) {
-		$demo = kk_demo_data();
-		$en   = kk_is_en();
-		foreach ( $demo['slides'] as $s ) {
-			$imgs = array();
-			foreach ( $s['images'] as $im ) {
-				$imgs[] = array( 'id' => 0, 'src' => kk_asset( 'img/products/' . $im . '.webp' ) );
-			}
-			$cache[] = array(
-				'mode'       => 'design',
-				'theme'      => $s['theme'],
-				'word'       => $s['word'],
-				'title'      => $en ? $s['title_en'] : $s['title_ar'],
-				'sub'        => $en ? $s['sub_en'] : $s['sub_ar'],
-				'btn1'       => $en ? $s['btn1_en'] : $s['btn1_ar'],
-				'btn1_url'   => kk_resolve_link( $s['btn1_url'] ),
-				'btn2'       => $en ? $s['btn2_en'] : $s['btn2_ar'],
-				'btn2_url'   => kk_resolve_link( $s['btn2_url'] ),
-				'images'     => $imgs,
-				'decor'      => $s['decor'],
-				'label'      => $en ? $s['label_en'] : $s['label_ar'],
-				'photo'      => 0,
-				'banner'     => 0,
-				'banner_m'   => 0,
-				'banner_url' => '',
-				'banner_alt' => '',
-			);
-		}
+		$cache = kk_fallback_slides();
 	}
 	return $cache;
+}
+
+/** Built-in banners shown before the demo content is imported. */
+function kk_fallback_slides() {
+	$d   = kk_demo_data();
+	$out = array();
+	$l   = kk_lang();
+	$pick = function ( $t ) use ( $l ) {
+		return isset( $t[ $l ] ) && '' !== $t[ $l ] ? $t[ $l ] : $t['en'];
+	};
+	$i = 0;
+	foreach ( $d['lines'] as $line ) {
+		if ( empty( $line['new'] ) ) {
+			continue;
+		}
+		$imgs = array();
+		foreach ( array_slice( $line['variants'], 0, 3 ) as $v ) {
+			$imgs[] = array( 'id' => 0, 'src' => kk_asset( 'img/p2/' . $v['img'] . '.webp' ) );
+		}
+		$out[] = array( 'mode' => 'design', 'new' => true, 'theme' => $i++ % 2 ? 'red' : 'gold', 'word' => 'NEW', 'title' => kk_t( 'newPrefix' ) . $pick( $line['name'] ), 'sub' => $pick( $line['desc'] ), 'btn1' => kk_t( 'browse' ), 'btn1_url' => kk_products_url(), 'btn2' => kk_t( 'chat' ), 'btn2_url' => kk_wa_url(), 'images' => $imgs, 'decor' => 'biscuit', 'label' => $pick( $line['name'] ), 'photo' => 0 );
+	}
+	foreach ( $d['categories'] as $c ) {
+		$imgs = array();
+		foreach ( $d['lines'] as $line ) {
+			if ( $line['cat'] === $c['key'] && count( $imgs ) < 3 ) {
+				$imgs[] = array( 'id' => 0, 'src' => kk_asset( 'img/p2/' . $line['variants'][0]['img'] . '.webp' ) );
+			}
+		}
+		$out[] = array( 'mode' => 'design', 'new' => false, 'theme' => $c['theme'], 'word' => $c['word'], 'title' => $pick( $c['banner_title'] ), 'sub' => $pick( $c['banner_sub'] ), 'btn1' => kk_t( 'browse' ), 'btn1_url' => kk_products_url(), 'btn2' => kk_t( 'chat' ), 'btn2_url' => kk_wa_url(), 'images' => $imgs, 'decor' => $c['decor'], 'label' => $pick( $c['name'] ), 'photo' => 0 );
+	}
+	return $out;
 }
 
 function kk_first_slide_image() {
@@ -230,8 +275,35 @@ function kk_first_slide_image() {
 	if ( empty( $s ) ) {
 		return '';
 	}
-	if ( 'image' === $s[0]['mode'] && $s[0]['banner'] ) {
+	if ( 'image' === $s[0]['mode'] && ! empty( $s[0]['banner'] ) ) {
 		return wp_get_attachment_image_url( $s[0]['banner'], 'full' );
 	}
 	return ! empty( $s[0]['images'][0]['src'] ) ? $s[0]['images'][0]['src'] : '';
+}
+
+/** Published reviews (CPT) with a fallback to the built-in ones. */
+function kk_get_reviews( $n = 12 ) {
+	$out   = array();
+	$posts = get_posts( array( 'post_type' => 'kk_review', 'post_status' => 'publish', 'posts_per_page' => $n, 'orderby' => array( 'menu_order' => 'ASC', 'date' => 'DESC' ) ) );
+	foreach ( $posts as $p ) {
+		$text = $p->post_content;
+		foreach ( kk_lang_chain() as $l ) {
+			if ( 'ar' === $l ) {
+				break;
+			}
+			$v = get_post_meta( $p->ID, '_kk_text_' . $l, true );
+			if ( $v ) {
+				$text = $v;
+				break;
+			}
+		}
+		$out[] = array( 'name' => get_the_title( $p ), 'text' => wp_strip_all_tags( $text ), 'city' => get_post_meta( $p->ID, '_kk_city', true ), 'rating' => max( 1, min( 5, (int) get_post_meta( $p->ID, '_kk_rating', true ) ? (int) get_post_meta( $p->ID, '_kk_rating', true ) : 5 ) ) );
+	}
+	if ( ! $out && ! get_option( 'kk_demo_done' ) ) {
+		$l = kk_lang();
+		foreach ( kk_demo_data()['reviews'] as $r ) {
+			$out[] = array( 'name' => isset( $r['name'][ $l ] ) && $r['name'][ $l ] ? $r['name'][ $l ] : $r['name']['en'], 'text' => isset( $r['t'][ $l ] ) && $r['t'][ $l ] ? $r['t'][ $l ] : $r['t']['en'], 'city' => '', 'rating' => 5 );
+		}
+	}
+	return $out;
 }

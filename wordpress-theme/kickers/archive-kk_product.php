@@ -10,12 +10,12 @@ $kk_term  = ( is_tax() ) ? get_queried_object() : null;
 $kk_brand = $kk_term && 'kk_brand' === $kk_term->taxonomy;
 if ( $kk_term ) {
 	$kk_name  = kk_term_name( $kk_term );
-	$kk_title = $kk_brand ? kk_t( 'brand_lead' ) . ' ' . ( get_term_meta( $kk_term->term_id, 'kk_name_en', true ) ? get_term_meta( $kk_term->term_id, 'kk_name_en', true ) : $kk_name ) : $kk_name;
+	$kk_title = $kk_brand ? kk_t( 'brandLead' ) . ' ' . ( get_term_meta( $kk_term->term_id, 'kk_name_en', true ) ? get_term_meta( $kk_term->term_id, 'kk_name_en', true ) : $kk_name ) : $kk_name;
 	$kk_lead  = kk_term_desc( $kk_term );
 	$kk_crumb = array( array( kk_t( 'products' ), kk_products_url() ), array( $kk_name, '' ) );
 } else {
 	$kk_title = kk_t( 'products' );
-	$kk_lead  = kk_t( 'products_lead' );
+	$kk_lead  = kk_t( 'productsLead' );
 	$kk_crumb = array( array( kk_t( 'products' ), '' ) );
 }
 $kk_img = '';

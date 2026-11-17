@@ -6,10 +6,11 @@
  */
 
 get_header();
-get_template_part( 'template-parts/page-hero', null, array( 'title' => get_the_title(), 'lead' => kk_optl( 'export_text' ), 'crumbs' => array( array( get_the_title(), '' ) ), 'img' => kk_asset( 'img/products/p12.webp' ) ) );
+get_template_part( 'template-parts/page-hero', null, array( 'title' => get_the_title(), 'lead' => kk_optl( 'export_text' ), 'crumbs' => array( array( get_the_title(), '' ) ), 'img' => kk_asset( 'img/p2/spread-1.webp' ) ) );
 get_template_part( 'template-parts/export', null, array( 'full' => true ) );
+get_template_part( 'template-parts/packing' );
 ?>
-<section class="section">
+<section class="section" style="padding-top:0">
 	<div class="wrap">
 		<header class="sec-head"><h2><?php echo esc_html( kk_optl( 'export_steps_title' ) ); ?></h2></header>
 		<div class="ex-steps" data-stagger>
@@ -19,9 +20,13 @@ get_template_part( 'template-parts/export', null, array( 'full' => true ) );
 		</div>
 	</div>
 </section>
-<?php get_template_part( 'template-parts/categories' ); ?>
-<section class="section" id="export-form" style="padding-top:0">
-	<div class="wrap" style="max-width:820px"><?php get_template_part( 'template-parts/contact-form', null, array( 'first_subject' => kk_t( 'export_subj' ) ) ); ?></div>
+<section class="section" style="padding-top:0">
+	<div class="wrap" style="max-width:820px">
+		<?php
+		$kk_subj = kk_lines( kk_optl( 'subjects' ) );
+		get_template_part( 'template-parts/contact-form', null, array( 'first_subject' => isset( $kk_subj[1] ) ? $kk_subj[1] : '', 'id' => 'export-form' ) );
+		?>
+	</div>
 </section>
 <?php
 get_footer();

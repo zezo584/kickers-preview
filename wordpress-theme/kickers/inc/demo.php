@@ -1,7 +1,7 @@
 <?php
 /**
- * One-click setup: imports categories, brands, 17 products with images, the 4 hero banners,
- * the About/Contact pages and sets the site icon to the logo.
+ * One-click setup v2: types (with banners), 7 brands with logos, 14 product lines with all flavours,
+ * reviews, pages (about, export, agent, reviews, contact), site icon = logo.
  * Appearance → "كيكرز: البداية السريعة".
  *
  * @package Kickers
@@ -19,14 +19,14 @@ add_action(
 add_action(
 	'admin_notices',
 	function () {
-		if ( ! current_user_can( 'manage_options' ) || get_option( 'kk_demo_done' ) ) {
+		if ( ! current_user_can( 'manage_options' ) || 2 <= (int) get_option( 'kk_demo_done' ) ) {
 			return;
 		}
 		$screen = get_current_screen();
 		if ( $screen && 'appearance_page_kk-setup' === $screen->id ) {
 			return;
 		}
-		echo '<div class="notice notice-info"><p><strong>قالب كيكرز فودز:</strong> اضغط "استيراد المحتوى" عشان المنتجات والبانرات والصفحات تتضاف تلقائيًا. <a class="button button-primary" href="' . esc_url( admin_url( 'themes.php?page=kk-setup' ) ) . '">البداية السريعة</a></p></div>';
+		echo '<div class="notice notice-info"><p><strong>قالب كيكرز فودز 2.0:</strong> اضغط "استيراد المحتوى" عشان المنتجات الجديدة والنكهات والبانرات والصفحات تتضاف. <a class="button button-primary" href="' . esc_url( admin_url( 'themes.php?page=kk-setup' ) ) . '">البداية السريعة</a></p></div>';
 	}
 );
 
@@ -36,53 +36,47 @@ function kk_setup_page() {
 	}
 	$log = array();
 	if ( isset( $_POST['kk_import'] ) && check_admin_referer( 'kk_import' ) ) {
-		$opts = array(
-			'front'    => ! empty( $_POST['kk_front'] ),
-			'icon'     => ! empty( $_POST['kk_icon'] ),
-			'pages'    => ! empty( $_POST['kk_pages'] ),
-			'products' => ! empty( $_POST['kk_products'] ),
-			'slides'   => ! empty( $_POST['kk_slides'] ),
-		);
-		$log  = kk_run_import( $opts );
+		$keys = array( 'products', 'reviews', 'pages', 'icon', 'front', 'cleanup' );
+		$o    = array();
+		foreach ( $keys as $k ) {
+			$o[ $k ] = ! empty( $_POST[ 'kk_' . $k ] );
+		}
+		$log = kk_run_import( $o );
 	}
 	echo '<div class="wrap kk-setup"><h1>كيكرز فودز — البداية السريعة</h1>';
 	if ( $log ) {
-		echo '<div class="notice notice-success"><p><strong>تم الاستيراد:</strong></p><ul style="list-style:disc;padding-inline-start:20px">';
+		echo '<div class="notice notice-success"><ul style="list-style:disc;padding-inline-start:20px">';
 		foreach ( $log as $l ) {
 			echo '<li>' . esc_html( $l ) . '</li>';
 		}
 		echo '</ul><p><a class="button button-primary" href="' . esc_url( home_url( '/' ) ) . '" target="_blank">افتح الموقع</a></p></div>';
 	}
-	echo '<div class="card"><h2>استيراد محتوى الموقع</h2><p>بيضيف محتوى كيكرز الجاهز (من الموقع القديم) مرة واحدة. لو حاجة موجودة بنفس الاسم بيسيبها زي ما هي، فممكن تضغط تاني بأمان.</p>';
-	echo '<form method="post">';
+	echo '<div class="card"><h2>استيراد محتوى الموقع</h2><p>آمن تضغطه أكتر من مرة: أي حاجة موجودة بنفس الرابط بتتساب زي ما هي.</p><form method="post">';
 	wp_nonce_field( 'kk_import' );
 	$checks = array(
-		'kk_products' => 'التصنيفات (4) والعلامات التجارية (6) والمنتجات (17) بصورها',
-		'kk_slides'   => 'بانرات السلايدر الرئيسية (4)',
-		'kk_pages'    => 'صفحات "من نحن" و"التصدير" و"تواصل معنا" (لو موجودة بنفس الرابط: about و contact هيتطبق عليها تصميم القالب)',
-		'kk_icon'     => 'أيقونة الموقع (Favicon) = شعار كيكرز',
-		'kk_front'    => 'الصفحة الرئيسية = تصميم القالب (يلغي صفحة Elementor الرئيسية القديمة من العرض بدون ما يمسحها)',
+		'kk_products' => '4 أنواع (سادة/محشو/مغطس/شيكولاتة سبريد) ببانراتها + 7 علامات بلوجوهاتها + 14 منتج بكل النكهات ومواصفات التعبئة',
+		'kk_reviews'  => 'آراء العملاء الحالية',
+		'kk_pages'    => 'صفحات: من نحن، التصدير، كن وكيلاً، آراء العملاء، تواصل معنا',
+		'kk_icon'     => 'أيقونة الموقع = شعار كيكرز',
+		'kk_front'    => 'الصفحة الرئيسية = تصميم القالب',
+		'kk_cleanup'  => 'نقل منتجات وبانرات النسخة الأولى من القالب لسلة المهملات (لو كنت استوردتها قبل كده)',
 	);
 	echo '<ul class="kk-steps">';
 	foreach ( $checks as $k => $label ) {
 		echo '<li><label><input type="checkbox" name="' . esc_attr( $k ) . '" value="1" checked> ' . esc_html( $label ) . '</label></li>';
 	}
 	echo '</ul><p><button class="button button-primary button-hero" name="kk_import" value="1">استيراد المحتوى</button></p></form></div>';
-
 	echo '<div class="card"><h2>هتعدّل منين؟</h2><ul style="list-style:disc;padding-inline-start:20px">';
-	echo '<li><strong>المنتجات:</strong> القائمة الجانبية ← المنتجات (أضف / عدّل الاسم والصورة والوزن والنسخة الإنجليزية، وعلّم "اعرض في الرئيسية").</li>';
-	echo '<li><strong>التصنيفات والعلامات:</strong> المنتجات ← التصنيفات / العلامات التجارية (الاسم الإنجليزي واللون والترتيب).</li>';
-	echo '<li><strong>البانرات:</strong> القائمة الجانبية ← بانرات السلايدر (تصميم متحرك أو صورة جاهزة للكمبيوتر والموبايل).</li>';
-	echo '<li><strong>كل النصوص وبيانات التواصل والسوشيال وSEO:</strong> المظهر ← تخصيص ← إعدادات كيكرز.</li>';
-	echo '<li><strong>الشعار:</strong> المظهر ← تخصيص ← هوية الموقع.</li>';
-	echo '<li><strong>رسائل نموذج التواصل:</strong> القائمة الجانبية ← رسائل التواصل (وبتوصل كمان على الإيميل).</li>';
-	echo '<li><strong>النسخة الإنجليزية:</strong> نفس الروابط بعد ‎/en/‎ — مثال: ' . esc_html( kk_url_to_lang( home_url( '/' ), 'en' ) ) . '</li>';
+	echo '<li><strong>منتج جديد:</strong> المنتجات ← أضف منتج ← اختار صور النكهات واكتب أسماءها، وعلّم "منتج جديد" → هيظهر عليه "جديد" ويتعمله بانر رئيسي متحرك لوحده.</li>';
+	echo '<li><strong>نوع جديد (زي سادة/محشو):</strong> المنتجات ← الأنواع ← أضف — وعلّم "اعمل بانر رئيسي" واكتب عنوان البانر بكل لغة.</li>';
+	echo '<li><strong>العلامات واللوجوهات:</strong> المنتجات ← العلامات التجارية.</li>';
+	echo '<li><strong>بانرات زيادة (عروض/مناسبات):</strong> بانرات إضافية.</li>';
+	echo '<li><strong>آراء العملاء:</strong> آراء العملاء — الآراء اللي بتيجي من الموقع بتستنى موافقتك.</li>';
+	echo '<li><strong>كل النصوص بالأربع لغات، الأرقام، التواصل، SEO:</strong> المظهر ← تخصيص ← إعدادات كيكرز.</li>';
+	echo '<li><strong>اللغات:</strong> عربي على الرابط الأساسي، و /en/ و /fr/ و /de/.</li>';
 	echo '</ul></div></div>';
 }
 
-/**
- * Copy an image from the theme into the Media Library (once).
- */
 function kk_import_image( $file, $title ) {
 	$map = get_option( 'kk_demo_media', array() );
 	if ( ! empty( $map[ $file ] ) && get_post( $map[ $file ] ) ) {
@@ -95,20 +89,12 @@ function kk_import_image( $file, $title ) {
 	require_once ABSPATH . 'wp-admin/includes/image.php';
 	require_once ABSPATH . 'wp-admin/includes/file.php';
 	require_once ABSPATH . 'wp-admin/includes/media.php';
-	$name   = 'kickers-' . basename( $file );
-	$upload = wp_upload_bits( $name, null, file_get_contents( $path ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+	$upload = wp_upload_bits( 'kickers-' . str_replace( '/', '-', $file ), null, file_get_contents( $path ) ); // phpcs:ignore
 	if ( ! empty( $upload['error'] ) ) {
 		return 0;
 	}
 	$type = wp_check_filetype( $upload['file'] );
-	$id   = wp_insert_attachment(
-		array(
-			'post_mime_type' => $type['type'],
-			'post_title'     => $title,
-			'post_status'    => 'inherit',
-		),
-		$upload['file']
-	);
+	$id   = wp_insert_attachment( array( 'post_mime_type' => $type['type'], 'post_title' => $title, 'post_status' => 'inherit' ), $upload['file'] );
 	if ( is_wp_error( $id ) || ! $id ) {
 		return 0;
 	}
@@ -119,98 +105,124 @@ function kk_import_image( $file, $title ) {
 	return (int) $id;
 }
 
-function kk_ensure_term( $tax, $slug, $name, $meta ) {
+function kk_product_exists( $slug ) {
+	return (bool) get_posts( array( 'post_type' => 'kk_product', 'name' => $slug, 'post_status' => array( 'publish', 'draft', 'pending', 'private', 'future' ), 'posts_per_page' => 1, 'fields' => 'ids' ) );
+}
+
+function kk_ensure_term( $tax, $slug, $name, $meta, $desc = '' ) {
 	$t = get_term_by( 'slug', $slug, $tax );
-	if ( ! $t ) {
-		$r = wp_insert_term( $name, $tax, array( 'slug' => $slug, 'description' => isset( $meta['desc_ar'] ) ? $meta['desc_ar'] : '' ) );
+	if ( $t ) {
+		$id = (int) $t->term_id;
+	} else {
+		$r = wp_insert_term( $name, $tax, array( 'slug' => $slug, 'description' => $desc ) );
 		if ( is_wp_error( $r ) ) {
 			return 0;
 		}
 		$id = (int) $r['term_id'];
-		foreach ( $meta as $k => $v ) {
-			if ( 'desc_ar' !== $k && '' !== (string) $v ) {
-				update_term_meta( $id, 'kk_' . $k, $v );
-			}
-		}
-		return $id;
 	}
-	return (int) $t->term_id;
+	foreach ( $meta as $k => $v ) {
+		if ( '' !== (string) $v && '' === (string) get_term_meta( $id, 'kk_' . $k, true ) ) {
+			update_term_meta( $id, 'kk_' . $k, $v );
+		}
+	}
+	return $id;
 }
 
 function kk_run_import( $o ) {
 	$d   = kk_demo_data();
 	$log = array();
+	$l3  = array( 'en', 'fr', 'de' );
 
-	$img_ids = array();
-	$names   = array();
-	foreach ( $d['products'] as $p ) {
-		$names[ $p['img'] ] = $p['name_en'];
+	if ( $o['cleanup'] ) {
+		$old = array( 'rosyl-sity-tea-biscuits-65g', 'sybynzu-tea-biscuits-25g', 'rosyl-sity-vanilla-cream-52g', 'rosyl-sity-strawberry-cream-52g', 'rosyl-sity-chocolate-cream-52g', 'yunar-wan-chocolate-38g', 'yunar-wan-chocolate-orange-pack-38g', 'yunar-wan-vanilla', 'lilaf-wan-vanilla-14g', 'lilaf-wan-vanilla-purple-pack-14g', 'lilaf-wan-chocolate-14g', 'rosyl-tella-750g', 'rosyl-tella-350g', 'yunar-tella-40g', 'rosyl-tella-200g', 'yunar-tella-20g', 'rosyl-tella-20g' );
+		$n   = 0;
+		foreach ( $old as $slug ) {
+			$p = get_posts( array( 'post_type' => 'kk_product', 'name' => $slug, 'posts_per_page' => 1 ) );
+			$p = $p ? $p[0] : null;
+			// v1 products have no packing data (_kk_units / _kk_carton_ar).
+			if ( $p && '' === (string) get_post_meta( $p->ID, '_kk_carton_ar', true ) && '' === (string) get_post_meta( $p->ID, '_kk_gallery', true ) ) {
+				wp_trash_post( $p->ID );
+				++$n;
+			}
+		}
+		foreach ( get_posts( array( 'post_type' => 'kk_slide', 'post_status' => 'any', 'posts_per_page' => 20, 'meta_key' => '_kk_word' ) ) as $s ) { // phpcs:ignore
+			if ( in_array( get_post_meta( $s->ID, '_kk_word', true ), array( 'Kickers', 'Yunar', 'Tella', 'Rosyl' ), true ) ) {
+				wp_trash_post( $s->ID );
+				++$n;
+			}
+		}
+		$t = get_term_by( 'slug', 'tella-spreads', 'kk_product_cat' );
+		if ( $t ) {
+			wp_update_term( $t->term_id, 'kk_product_cat', array( 'slug' => 'chocolate-spreads', 'name' => 'شيكولاتة سبريد' ) );
+		}
+		$log[] = 'عناصر قديمة اتنقلت للسلة: ' . $n;
 	}
 
 	if ( $o['products'] ) {
 		$cat_ids = array();
 		foreach ( $d['categories'] as $i => $c ) {
-			$cat_ids[ $c['key'] ] = kk_ensure_term(
-				'kk_product_cat',
-				$c['slug'],
-				$c['name_ar'],
-				array(
-					'name_en' => $c['name_en'],
-					'desc_ar' => $c['desc_ar'],
-					'desc_en' => $c['desc_en'],
-					'color'   => $c['color'],
-					'ink'     => $c['ink'],
-					'order'   => $i + 1,
-				)
-			);
+			$meta = array( 'color' => $c['color'], 'ink' => $c['ink'], 'order' => $i + 1, 'banner_show' => '1', 'banner_theme' => $c['theme'], 'banner_word' => $c['word'], 'banner_decor' => $c['decor'] );
+			foreach ( $l3 as $l ) {
+				$meta[ 'name_' . $l ] = $c['name'][ $l ];
+				$meta[ 'desc_' . $l ] = $c['desc'][ $l ];
+			}
+			foreach ( array( 'ar', 'en', 'fr', 'de' ) as $l ) {
+				$meta[ 'banner_title_' . $l ] = $c['banner_title'][ $l ];
+				$meta[ 'banner_sub_' . $l ]   = $c['banner_sub'][ $l ];
+			}
+			$cat_ids[ $c['key'] ] = kk_ensure_term( 'kk_product_cat', $c['slug'], $c['name']['ar'], $meta, $c['desc']['ar'] );
 		}
 		$brand_ids = array();
 		foreach ( $d['brands'] as $i => $b ) {
-			$brand_ids[ $b['slug'] ] = kk_ensure_term(
-				'kk_brand',
-				$b['slug'],
-				$b['name_ar'],
-				array(
-					'name_en' => $b['name_en'],
-					'color'   => $b['color'],
-					'order'   => $i + 1,
-				)
-			);
+			$meta = array( 'name_en' => $b['name_en'], 'name_fr' => $b['name_en'], 'name_de' => $b['name_en'], 'color' => $b['color'], 'order' => $i + 1 );
+			if ( $b['logo'] ) {
+				$meta['logo'] = kk_import_image( 'brands/' . $b['logo'] . '.webp', $b['name_en'] );
+			}
+			$brand_ids[ $b['slug'] ] = kk_ensure_term( 'kk_brand', $b['slug'], $b['name_ar'], $meta );
 		}
-		$log[] = 'التصنيفات: ' . count( $cat_ids ) . ' — العلامات التجارية: ' . count( $brand_ids );
+		$log[] = 'الأنواع: ' . count( $cat_ids ) . ' — العلامات: ' . count( $brand_ids );
 
 		$added = 0;
-		foreach ( $d['products'] as $i => $p ) {
-			$exists = get_page_by_path( $p['slug'], OBJECT, 'kk_product' );
-			if ( $exists ) {
+		foreach ( $d['lines'] as $i => $p ) {
+			if ( kk_product_exists( $p['slug'] ) ) {
 				continue;
 			}
-			$img = kk_import_image( 'products/' . $p['img'] . '.webp', $p['name_ar'] );
-			$id  = wp_insert_post(
-				array(
-					'post_type'    => 'kk_product',
-					'post_status'  => 'publish',
-					'post_title'   => $p['name_ar'],
-					'post_name'    => $p['slug'],
-					'post_excerpt' => $p['desc_ar'],
-					'post_content' => '',
-					'menu_order'   => $i + 1,
-				)
-			);
+			$imgs    = array();
+			$flavors = array();
+			foreach ( $p['variants'] as $v ) {
+				$imgs[] = kk_import_image( 'p2/' . $v['img'] . '.webp', $p['name']['ar'] . ( $v['flavor'] ? ' — ' . $v['flavor']['ar'] : '' ) );
+				$flavors[] = $v['flavor'] ? implode( ' | ', array( $v['flavor']['ar'], $v['flavor']['en'], $v['flavor']['fr'], $v['flavor']['de'] ) ) : '';
+			}
+			$id = wp_insert_post( array( 'post_type' => 'kk_product', 'post_status' => 'publish', 'post_title' => $p['name']['ar'], 'post_name' => $p['slug'], 'post_excerpt' => $p['desc']['ar'], 'menu_order' => $i + 1 ) );
 			if ( ! $id || is_wp_error( $id ) ) {
 				continue;
 			}
-			if ( $img ) {
-				set_post_thumbnail( $id, $img );
+			$imgs = array_filter( $imgs );
+			if ( $imgs ) {
+				set_post_thumbnail( $id, reset( $imgs ) );
+				update_post_meta( $id, '_kk_gallery', implode( ',', $imgs ) );
 			}
-			update_post_meta( $id, '_kk_title_en', $p['name_en'] );
-			update_post_meta( $id, '_kk_excerpt_en', $p['desc_en'] );
-			if ( $p['weight_ar'] ) {
-				update_post_meta( $id, '_kk_weight_ar', $p['weight_ar'] );
-				update_post_meta( $id, '_kk_weight_en', $p['weight_en'] );
+			if ( array_filter( $flavors ) ) {
+				update_post_meta( $id, '_kk_flavors', implode( "\n", $flavors ) );
+			}
+			foreach ( $l3 as $l ) {
+				update_post_meta( $id, '_kk_title_' . $l, $p['name'][ $l ] );
+				update_post_meta( $id, '_kk_excerpt_' . $l, $p['desc'][ $l ] );
+			}
+			foreach ( array( 'ar', 'en', 'fr', 'de' ) as $l ) {
+				if ( $p['weight'][ $l ] ) {
+					update_post_meta( $id, '_kk_weight_' . $l, $p['weight'][ $l ] );
+				}
+				if ( $p['carton'][ $l ] ) {
+					update_post_meta( $id, '_kk_carton_' . $l, $p['carton'][ $l ] );
+				}
+			}
+			if ( $p['units'] ) {
+				update_post_meta( $id, '_kk_units', (string) $p['units'] );
 			}
 			update_post_meta( $id, '_kk_tint', $p['tint'] );
-			if ( $p['featured'] ) {
+			if ( ! empty( $p['new'] ) ) {
+				update_post_meta( $id, '_kk_new', '1' );
 				update_post_meta( $id, '_kk_featured', '1' );
 			}
 			if ( ! empty( $cat_ids[ $p['cat'] ] ) ) {
@@ -224,87 +236,48 @@ function kk_run_import( $o ) {
 		$log[] = 'منتجات جديدة: ' . $added;
 	}
 
-	if ( $o['slides'] ) {
-		$have = get_posts( array( 'post_type' => 'kk_slide', 'post_status' => 'any', 'posts_per_page' => 1, 'fields' => 'ids' ) );
-		if ( $have ) {
-			$log[] = 'البانرات موجودة بالفعل — اتسابت زي ما هي.';
-		} else {
-			foreach ( $d['slides'] as $i => $s ) {
-				$id = wp_insert_post(
-					array(
-						'post_type'   => 'kk_slide',
-						'post_status' => 'publish',
-						'post_title'  => $s['title_ar'],
-						'menu_order'  => $i + 1,
-					)
-				);
-				if ( ! $id || is_wp_error( $id ) ) {
-					continue;
-				}
-				$meta = array(
-					'mode'     => 'design',
-					'title_en' => $s['title_en'],
-					'word'     => $s['word'],
-					'sub_ar'   => $s['sub_ar'],
-					'sub_en'   => $s['sub_en'],
-					'label_ar' => $s['label_ar'],
-					'label_en' => $s['label_en'],
-					'theme'    => $s['theme'],
-					'decor'    => $s['decor'],
-					'btn1_ar'  => $s['btn1_ar'],
-					'btn1_en'  => $s['btn1_en'],
-					'btn1_url' => $s['btn1_url'],
-					'btn2_ar'  => $s['btn2_ar'],
-					'btn2_en'  => $s['btn2_en'],
-					'btn2_url' => $s['btn2_url'],
-				);
-				foreach ( $s['images'] as $k => $im ) {
-					$meta[ 'img' . ( $k + 1 ) ] = kk_import_image( 'products/' . $im . '.webp', isset( $names[ $im ] ) ? $names[ $im ] : $im );
-				}
-				foreach ( $meta as $k => $v ) {
-					update_post_meta( $id, '_kk_' . $k, $v );
+	if ( $o['reviews'] && ! get_posts( array( 'post_type' => 'kk_review', 'post_status' => 'any', 'posts_per_page' => 1, 'fields' => 'ids' ) ) ) {
+		foreach ( $d['reviews'] as $i => $r ) {
+			$id = wp_insert_post( array( 'post_type' => 'kk_review', 'post_status' => 'publish', 'post_title' => $r['name']['ar'], 'post_content' => $r['t']['ar'], 'menu_order' => $i ) );
+			if ( $id && ! is_wp_error( $id ) ) {
+				update_post_meta( $id, '_kk_rating', '5' );
+				update_post_meta( $id, '_kk_title_en', $r['name']['en'] );
+				foreach ( $l3 as $l ) {
+					update_post_meta( $id, '_kk_text_' . $l, $r['t'][ $l ] );
 				}
 			}
-			$log[] = 'البانرات: ' . count( $d['slides'] );
 		}
+		$log[] = 'آراء العملاء: ' . count( $d['reviews'] );
 	}
 
 	if ( $o['pages'] ) {
 		$pages = array(
-			'about'   => array( 'من نحن', 'About us', 'page-about.php' ),
-			'contact' => array( 'تواصل معنا', 'Contact us', 'page-contact.php' ),
-			'export'  => array( 'التصدير', 'Export', 'page-export.php' ),
+			'about'   => array( 'من نحن', 'About us', 'À propos', 'Über uns', 'page-about.php' ),
+			'export'  => array( 'التصدير', 'Export', 'Export', 'Export', 'page-export.php' ),
+			'agent'   => array( 'كن وكيلاً', 'Become an agent', 'Devenir agent', 'Partner werden', 'page-agent.php' ),
+			'reviews' => array( 'آراء العملاء', 'Customer reviews', 'Avis clients', 'Kundenbewertungen', 'page-reviews.php' ),
+			'contact' => array( 'تواصل معنا', 'Contact us', 'Contact', 'Kontakt', 'page-contact.php' ),
 		);
 		foreach ( $pages as $slug => $pg ) {
-			$p = get_page_by_path( $slug );
-			if ( $p ) {
-				$id = $p->ID;
-				if ( 'publish' !== $p->post_status ) {
-					wp_update_post( array( 'ID' => $id, 'post_status' => 'publish' ) );
-				}
-			} else {
-				$id = wp_insert_post(
-					array(
-						'post_type'   => 'page',
-						'post_status' => 'publish',
-						'post_title'  => $pg[0],
-						'post_name'   => $slug,
-					)
-				);
+			$p  = get_page_by_path( $slug );
+			$id = $p ? $p->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $pg[0], 'post_name' => $slug ) );
+			if ( $p && 'publish' !== $p->post_status ) {
+				wp_update_post( array( 'ID' => $id, 'post_status' => 'publish' ) );
 			}
 			if ( $id && ! is_wp_error( $id ) ) {
-				update_post_meta( $id, '_wp_page_template', $pg[2] );
+				update_post_meta( $id, '_wp_page_template', $pg[4] );
 				update_post_meta( $id, '_kk_title_en', $pg[1] );
+				update_post_meta( $id, '_kk_title_fr', $pg[2] );
+				update_post_meta( $id, '_kk_title_de', $pg[3] );
 			}
 		}
-		$log[] = 'صفحات من نحن والتصدير وتواصل معنا جاهزة.';
+		$log[] = 'الصفحات جاهزة: من نحن، التصدير، كن وكيلاً، آراء العملاء، تواصل معنا.';
 	}
 
 	if ( $o['icon'] ) {
 		$icon = kk_import_image( 'brand/icon-512.png', 'Kickers icon' );
 		if ( $icon ) {
 			update_option( 'site_icon', $icon );
-			$log[] = 'أيقونة الموقع = الشعار.';
 		}
 		if ( ! get_theme_mod( 'custom_logo' ) ) {
 			$logo = kk_import_image( 'brand/logo.png', 'Kickers logo' );
@@ -312,14 +285,12 @@ function kk_run_import( $o ) {
 				set_theme_mod( 'custom_logo', $logo );
 			}
 		}
+		$log[] = 'أيقونة الموقع = الشعار.';
 	}
-
 	if ( $o['front'] ) {
 		update_option( 'show_on_front', 'posts' );
-		$log[] = 'الصفحة الرئيسية بتعرض تصميم القالب.';
 	}
-
-	update_option( 'kk_demo_done', 1 );
+	update_option( 'kk_demo_done', 2 );
 	flush_rewrite_rules();
 	return $log;
 }
