@@ -144,7 +144,7 @@
     var s = C.site;
     return '<footer class="site-footer crimp-t"><div class="wrap"><div class="f-grid">' +
       '<div><a class="f-logo" href="#home"><img src="assets/img/brand/logo.webp" alt="' + esc(L(s.name)) + '" width="241" height="120" loading="lazy"></a><p class="f-about">' + esc(L(s.footer)) + '</p>' +
-      '<div class="socials"><a href="' + WA + '" target="_blank" rel="noopener" aria-label="WhatsApp">' + ico('i-whatsapp') + '</a><a href="#" aria-label="Facebook">' + ico('i-facebook') + '</a><a href="#" aria-label="Instagram">' + ico('i-instagram') + '</a><a href="#" aria-label="TikTok">' + ico('i-tiktok') + '</a></div></div>' +
+      '<div class="socials"><a href="' + WA + '" target="_blank" rel="noopener" aria-label="WhatsApp">' + ico('i-whatsapp') + '</a><a href="https://www.facebook.com/share/1A7YV93uor/" target="_blank" rel="noopener" aria-label="Facebook">' + ico('i-facebook') + '</a><a href="https://www.instagram.com/kickers010/" target="_blank" rel="noopener" aria-label="Instagram">' + ico('i-instagram') + '</a></div></div>' +
       '<div><h2 class="f-title">' + t('quick') + '</h2><ul class="f-links">' + NAV.map(function (n) { return '<li><a href="' + n[1] + '">' + t(n[0]) + '</a></li>'; }).join('') + '</ul></div>' +
       '<div><h2 class="f-title">' + t('products') + '</h2><ul class="f-links">' + C.categories.map(function (c) { return '<li><a href="#cat-' + c.slug + '">' + esc(L(c.name)) + '</a></li>'; }).join('') + '</ul></div>' +
       '<div><h2 class="f-title">' + t('reach') + '</h2><ul class="f-contact">' +
