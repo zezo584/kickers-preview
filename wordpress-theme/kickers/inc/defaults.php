@@ -98,7 +98,7 @@ function kk_defaults() {
 			'promise2_t_en' => 'Constant flavour innovation',
 			'promise2_t_fr' => 'Innovation continue des saveurs',
 			'promise2_t_de' => 'Ständig neue Sorten',
-			'promise2_d_ar' => 'نكهات وأشكال جديدة باستمرار زي المربع الجديد وميني هيفا.',
+			'promise2_d_ar' => 'نكهات وأشكال جديدة باستمرار زي المربع الجديد وميني هيفاء.',
 			'promise2_d_en' => 'New flavours and shapes, like the new square and Meny Haifa.',
 			'promise2_d_fr' => 'De nouvelles saveurs et formes, comme le carré et Meny Haifa.',
 			'promise2_d_de' => 'Neue Sorten und Formen – wie das Quadrat und Meny Haifa.',
@@ -1136,7 +1136,7 @@ function kk_demo_data() {
 					'de' => 'Schokoliert ab dem ersten Biss',
 				),
 				'banner_sub' => array(
-					'ar' => 'يونار وان، ليلاف وان وميني هيفا: محشو بالكريمة ومغطس بالشوكولاتة.',
+					'ar' => 'يونار وان، ليلاف وان وميني هيفاء: محشو بالكريمة ومغطس بالشوكولاتة.',
 					'en' => 'Yunar Wan, Lilaf Wan and Meny Haifa: cream-filled and chocolate-coated.',
 					'fr' => 'Yunar Wan, Lilaf Wan et Meny Haifa : fourrés à la crème et enrobés de chocolat.',
 					'de' => 'Yunar Wan, Lilaf Wan und Meny Haifa: cremig gefüllt und schokoliert.',
@@ -1207,7 +1207,7 @@ function kk_demo_data() {
 			),
 			array(
 				'slug' => 'meny-haifa',
-				'name_ar' => 'ميني هيفا',
+				'name_ar' => 'ميني هيفاء',
 				'name_en' => 'Meny Haifa',
 				'color' => '#C4121F',
 				'logo' => 'meny-haifa',
@@ -1305,7 +1305,7 @@ function kk_demo_data() {
 				'new' => true,
 				'tint' => '#FFD9D2',
 				'name' => array(
-					'ar' => 'ميني هيفا جامبو',
+					'ar' => 'ميني هيفاء جامبو',
 					'en' => 'Meny Haifa Jumbo',
 					'fr' => 'Meny Haifa Jumbo',
 					'de' => 'Meny Haifa Jumbo',
@@ -1841,7 +1841,7 @@ function kk_demo_data() {
 				'brand' => 'meny-haifa',
 				'tint' => '#E8D9CC',
 				'name' => array(
-					'ar' => 'ميني هيفا كريمة شوكولاتة 20 جم',
+					'ar' => 'ميني هيفاء كريمة شوكولاتة 20 جم',
 					'en' => 'Meny Haifa Chocolate Cream 20 g',
 					'fr' => 'Meny Haifa crème au chocolat 20 g',
 					'de' => 'Meny Haifa Schokocreme 20 g',

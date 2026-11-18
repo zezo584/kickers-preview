@@ -205,6 +205,46 @@ function kk_run_import( $o ) {
 			}
 		}
 
+		// v2.2: correct spelling "هيفا" → "هيفاء" in existing brand and product names.
+		$kk_fix = function ( $t ) {
+			return preg_replace( '/هيفا(?!ء)/u', 'هيفاء', $t );
+		};
+		$kk_bt = get_term_by( 'slug', 'meny-haifa', 'kk_brand' );
+		if ( $kk_bt && $kk_fix( $kk_bt->name ) !== $kk_bt->name ) {
+			wp_update_term( $kk_bt->term_id, 'kk_brand', array( 'name' => $kk_fix( $kk_bt->name ) ) );
+		}
+		foreach ( get_posts( array( 'post_type' => 'kk_product', 'post_status' => 'any', 'posts_per_page' => -1 ) ) as $kk_pp ) {
+			$kk_new = array( 'ID' => $kk_pp->ID );
+			if ( $kk_fix( $kk_pp->post_title ) !== $kk_pp->post_title ) {
+				$kk_new['post_title'] = $kk_fix( $kk_pp->post_title );
+			}
+			if ( $kk_fix( $kk_pp->post_excerpt ) !== $kk_pp->post_excerpt ) {
+				$kk_new['post_excerpt'] = $kk_fix( $kk_pp->post_excerpt );
+			}
+			if ( count( $kk_new ) > 1 ) {
+				wp_update_post( $kk_new );
+			}
+		}
+
+		foreach ( get_terms( array( 'taxonomy' => 'kk_product_cat', 'hide_empty' => false ) ) as $kk_tt ) {
+			if ( $kk_fix( $kk_tt->description ) !== $kk_tt->description ) {
+				wp_update_term( $kk_tt->term_id, 'kk_product_cat', array( 'description' => $kk_fix( $kk_tt->description ) ) );
+			}
+			foreach ( get_term_meta( $kk_tt->term_id ) as $kk_mk => $kk_mv ) {
+				$kk_mv = (string) $kk_mv[0];
+				if ( $kk_fix( $kk_mv ) !== $kk_mv ) {
+					update_term_meta( $kk_tt->term_id, $kk_mk, $kk_fix( $kk_mv ) );
+				}
+			}
+		}
+		foreach ( (array) get_option( 'kk_demo_media', array() ) as $kk_aid ) {
+			$kk_alt = (string) get_post_meta( $kk_aid, '_wp_attachment_image_alt', true );
+			if ( $kk_alt && $kk_fix( $kk_alt ) !== $kk_alt ) {
+				update_post_meta( $kk_aid, '_wp_attachment_image_alt', $kk_fix( $kk_alt ) );
+				wp_update_post( array( 'ID' => $kk_aid, 'post_title' => $kk_fix( get_the_title( $kk_aid ) ) ) );
+			}
+		}
+
 		$added = 0;
 		foreach ( $d['lines'] as $i => $p ) {
 			if ( kk_product_exists( $p['slug'] ) ) {
