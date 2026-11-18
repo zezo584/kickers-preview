@@ -182,6 +182,29 @@ function kk_run_import( $o ) {
 		}
 		$log[] = 'الأنواع: ' . count( $cat_ids ) . ' — العلامات: ' . count( $brand_ids );
 
+		// v2.1: the cookie-shaped tub became "Meny Haifa chocolate cream 20 g".
+		$kk_old = get_posts( array( 'post_type' => 'kk_product', 'name' => 'kickers-cookie-tub', 'post_status' => 'any', 'posts_per_page' => 1 ) );
+		if ( $kk_old && ! kk_product_exists( 'meny-haifa-chocolate-cream-20g' ) ) {
+			foreach ( $d['lines'] as $p ) {
+				if ( 'meny-haifa-chocolate-cream-20g' !== $p['slug'] ) {
+					continue;
+				}
+				$id = $kk_old[0]->ID;
+				wp_update_post( array( 'ID' => $id, 'post_name' => $p['slug'], 'post_title' => $p['name']['ar'], 'post_excerpt' => $p['desc']['ar'] ) );
+				foreach ( $l3 as $l ) {
+					update_post_meta( $id, '_kk_title_' . $l, $p['name'][ $l ] );
+					update_post_meta( $id, '_kk_excerpt_' . $l, $p['desc'][ $l ] );
+				}
+				foreach ( array( 'ar', 'en', 'fr', 'de' ) as $l ) {
+					update_post_meta( $id, '_kk_weight_' . $l, $p['weight'][ $l ] );
+				}
+				if ( ! empty( $brand_ids[ $p['brand'] ] ) ) {
+					wp_set_object_terms( $id, array( (int) $brand_ids[ $p['brand'] ] ), 'kk_brand' );
+				}
+				$log[] = 'تم تحويل "علبة كيكرز البسكويتة" إلى "' . $p['name']['ar'] . '".';
+			}
+		}
+
 		$added = 0;
 		foreach ( $d['lines'] as $i => $p ) {
 			if ( kk_product_exists( $p['slug'] ) ) {
@@ -275,7 +298,7 @@ function kk_run_import( $o ) {
 	}
 
 	if ( $o['icon'] ) {
-		$icon = kk_import_image( 'brand/icon-512.png', 'Kickers icon' );
+		$icon = kk_import_image( 'brand/site-icon.png', 'Kickers logo icon' );
 		if ( $icon ) {
 			update_option( 'site_icon', $icon );
 		}

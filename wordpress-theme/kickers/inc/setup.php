@@ -108,7 +108,9 @@ add_action(
 			return;
 		}
 		echo '<link rel="icon" href="' . esc_url( kk_asset( 'img/brand/favicon.ico' ) ) . '" sizes="any">' . "\n";
+		echo '<link rel="icon" type="image/png" sizes="32x32" href="' . esc_url( kk_asset( 'img/brand/favicon-32.png' ) ) . '">' . "\n";
 		echo '<link rel="icon" type="image/png" sizes="192x192" href="' . esc_url( kk_asset( 'img/brand/icon-192.png' ) ) . '">' . "\n";
+		echo '<link rel="manifest" href="' . esc_url( kk_asset( 'img/brand/site.webmanifest' ) ) . '">' . "\n";
 		echo '<link rel="apple-touch-icon" href="' . esc_url( kk_asset( 'img/brand/apple-touch-icon.png' ) ) . '">' . "\n";
 	},
 	3

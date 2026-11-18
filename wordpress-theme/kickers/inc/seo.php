@@ -17,13 +17,20 @@ add_filter(
 	function ( $parts ) {
 		$parts['site'] = kk_site_name();
 		if ( is_front_page() ) {
+			$kk_ht = trim( (string) kk_optl( 'home_title' ) );
+			if ( $kk_ht ) {
+				return array( 'title' => $kk_ht );
+			}
 			$parts['title']   = kk_site_name();
 			$parts['tagline'] = kk_optl( 'tagline' );
 			unset( $parts['site'] );
 		} elseif ( is_post_type_archive( 'kk_product' ) ) {
-			$parts['title'] = kk_t( 'products' );
+			$parts['title'] = kk_t( 'products' ) . ' – ' . kk_optl( 'tagline' );
 		} elseif ( is_tax( array( 'kk_product_cat', 'kk_brand' ) ) ) {
 			$parts['title'] = kk_term_name( get_queried_object() );
+		} elseif ( is_singular( 'kk_product' ) ) {
+			$kk_p = kk_product( get_queried_object() );
+			$parts['title'] = wp_strip_all_tags( $kk_p['title'] ) . ( $kk_p['cat'] ? ' – ' . kk_term_name( $kk_p['cat'] ) : '' );
 		} elseif ( is_singular() ) {
 			$parts['title'] = wp_strip_all_tags( get_the_title() );
 		}
@@ -41,6 +48,22 @@ add_filter(
 function kk_seo_description() {
 	if ( is_front_page() ) {
 		return kk_optl( 'meta_desc' );
+	}
+	if ( is_singular( 'kk_product' ) ) {
+		$p   = kk_product( get_queried_object() );
+		$bit = array( trim( wp_strip_all_tags( kk_excerpt( $p['id'] ) ) ) );
+		$fl  = array_filter( wp_list_pluck( $p['variants'], 'name' ) );
+		if ( count( $fl ) > 1 ) {
+			$bit[] = kk_t( 'flavors' ) . ': ' . implode( kk_is_ar() ? '، ' : ', ', $fl ) . '.';
+		}
+		if ( $p['weight'] ) {
+			$bit[] = kk_t( 'weight' ) . ': ' . $p['weight'] . '.';
+		}
+		if ( $p['carton'] ) {
+			$bit[] = kk_t( 'carton' ) . ': ' . $p['carton'] . '.';
+		}
+		$bit[] = kk_site_name() . '.';
+		return implode( ' ', array_filter( $bit ) );
 	}
 	if ( is_singular() ) {
 		$d = kk_excerpt( get_queried_object() );
@@ -139,6 +162,14 @@ add_action(
 				echo '<meta property="og:image:width" content="' . (int) $img[1] . '"><meta property="og:image:height" content="' . (int) $img[2] . '">' . "\n";
 			}
 			echo '<meta name="twitter:card" content="summary_large_image">' . "\n";
+			echo '<meta name="twitter:title" content="' . esc_attr( $title ) . '">' . "\n";
+			if ( $desc ) {
+				echo '<meta name="twitter:description" content="' . esc_attr( wp_html_excerpt( $desc, 200, '…' ) ) . '">' . "\n";
+			}
+			echo '<meta name="twitter:image" content="' . esc_url( $img[0] ) . '">' . "\n";
+			if ( is_singular( 'kk_product' ) ) {
+				echo '<meta property="og:image:alt" content="' . esc_attr( wp_strip_all_tags( get_the_title() ) ) . '">' . "\n";
+			}
 		} elseif ( $canonical && ( defined( 'SURERANK_VERSION' ) || class_exists( 'SureRank\\Inc\\Loader' ) ) && ! kk_is_ar() ) {
 			echo '<link rel="canonical" href="' . esc_url( $canonical ) . '">' . "\n";
 		}
@@ -202,7 +233,7 @@ function kk_jsonld() {
 				'@type'             => 'ContactPoint',
 				'telephone'         => kk_phone_intl( $ph ),
 				'contactType'       => 'customer service',
-				'availableLanguage' => array( 'Arabic', 'English' ),
+				'availableLanguage' => array( 'Arabic', 'English', 'French', 'German' ),
 			);
 		}
 	}
@@ -218,6 +249,8 @@ function kk_jsonld() {
 				'@type' => 'ImageObject',
 				'url'   => kk_logo_url(),
 			),
+			'description'   => wp_strip_all_tags( kk_optl( 'meta_desc' ) ),
+			'foundingDate'  => (string) kk_opt( 'years_since' ),
 			'email'         => kk_opt( 'email' ),
 			'address'       => $addresses,
 			'contactPoint'  => $contacts,
@@ -228,10 +261,36 @@ function kk_jsonld() {
 		'@type'      => 'WebSite',
 		'@id'        => $home . '#website',
 		'url'        => $home,
-		'name'       => kk_site_name(),
-		'inLanguage' => kk_lang(),
-		'publisher'  => array( '@id' => $org ),
+		'name'        => kk_site_name(),
+		'description' => wp_strip_all_tags( kk_optl( 'meta_desc' ) ),
+		'inLanguage'  => kk_lang(),
+		'publisher'   => array( '@id' => $org ),
 	);
+
+	if ( is_front_page() || is_post_type_archive( 'kk_product' ) || is_tax( array( 'kk_product_cat', 'kk_brand' ) ) ) {
+		$q_args = array( 'posts_per_page' => 40 );
+		if ( is_tax() ) {
+			$qo               = get_queried_object();
+			$q_args['tax_query'] = array( array( 'taxonomy' => $qo->taxonomy, 'terms' => $qo->term_id ) ); // phpcs:ignore
+		}
+		$els = array();
+		foreach ( kk_query_products( $q_args )->posts as $i => $pp ) {
+			$els[] = array(
+				'@type'    => 'ListItem',
+				'position' => $i + 1,
+				'url'      => get_permalink( $pp ),
+				'name'     => wp_strip_all_tags( get_the_title( $pp ) ),
+			);
+		}
+		if ( $els ) {
+			$graph[] = array(
+				'@type'           => 'ItemList',
+				'name'            => kk_t( 'products' ),
+				'numberOfItems'   => count( $els ),
+				'itemListElement' => $els,
+			);
+		}
+	}
 
 	if ( is_singular( 'kk_product' ) ) {
 		$p       = kk_product( get_queried_object() );

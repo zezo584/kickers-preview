@@ -1,4 +1,4 @@
-# Kickers Foods – new website (v2)
+# Kickers Foods – new website (v2.1)
 
 This is the redesign of [kickersfoods.com](https://kickersfoods.com/) for Kickers Food Industries.
 
@@ -17,7 +17,7 @@ The site is in four languages:
 | Path | What it is |
 |---|---|
 | `index.html` + `assets/` | Clickable preview of the whole site. See the page list below. |
-| `kickers-theme.zip` | Installable WordPress theme, v2.0.0 (Appearance → Themes → Upload). |
+| `kickers-theme.zip` | Installable WordPress theme, v2.1.0 (Appearance → Themes → Upload). |
 | `wordpress-theme/kickers/` | Theme source code. |
 
 The preview includes:

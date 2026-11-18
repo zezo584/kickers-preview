@@ -68,6 +68,7 @@ $kk_loc  = 'footer_none';
 			<span>© <span data-year><?php echo esc_html( gmdate( 'Y' ) ); ?></span> <?php echo esc_html( kk_optl( 'tagline' ) ); ?>. <?php echo esc_html( kk_t( 'rights' ) ); ?></span>
 			<span class="f-langs"><?php foreach ( kk_langs() as $kk_c => $kk_l ) : ?><a href="<?php echo esc_url( kk_switch_url( $kk_c ) ); ?>" hreflang="<?php echo esc_attr( $kk_c ); ?>"><?php echo esc_html( $kk_l['name'] ); ?></a> <?php endforeach; ?></span>
 		</div>
+		<p class="f-credit" dir="ltr"><a href="https://bitweave.io" target="_blank" rel="noopener">by bitweave.io</a></p>
 	</div>
 </footer>
 <a class="fab" href="<?php echo esc_url( kk_wa_url() ); ?>" target="_blank" rel="noopener" aria-label="<?php echo esc_attr( kk_t( 'chat' ) ); ?>"><?php echo kk_ico( 'i-whatsapp' ); // phpcs:ignore ?></a>

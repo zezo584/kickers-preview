@@ -112,6 +112,7 @@ function kk_customizer_map() {
 			'subjects'     => array( 'اختيارات نوع الطلب (مفصولة بفاصلة)', 'ml' ),
 		) ),
 		'kk_seo' => array( 'محركات البحث (SEO)', array(
+			'home_title'          => array( 'عنوان الصفحة الرئيسية في جوجل', 'ml' ),
 			'meta_desc'           => array( 'وصف الموقع لجوجل', 'ml_area' ),
 			'og_image'            => array( 'صورة المشاركة (1200×630)', 'image' ),
 			'google_verification' => array( 'كود Google Search Console', 'text' ),

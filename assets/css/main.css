@@ -1066,3 +1066,13 @@ html[lang="ar"] .p-new { font-family: var(--font-ar); }
   .cta-band .fp-1 { top: 22px; bottom: auto; inset-inline-start: -8px; }
   .cta-band .fp-2 { top: 34px; bottom: auto; inset-inline-end: -8px; }
 }
+
+/* flavour line on single-flavour cards */
+.p-flavor { display: inline-block; margin-top: 2px; font-size: .86rem; font-weight: 800; color: var(--red-600); }
+@media (max-width: 640px) { .p-flavor { font-size: .78rem; } }
+
+/* agency credit */
+.f-credit { margin: 18px 0 0; text-align: center; font-family: var(--font-en); font-size: .82rem; font-weight: 700; letter-spacing: .02em; }
+.f-credit a { color: rgba(255, 246, 230, .5); transition: color .2s; }
+.f-credit a:hover, .f-credit a:focus-visible { color: var(--gold); }
+@media (max-width: 640px) { .f-credit { padding-bottom: 70px; } }

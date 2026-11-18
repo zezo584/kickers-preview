@@ -152,7 +152,7 @@
       '<li>' + ico('i-mail') + '<a href="mailto:' + s.email + '">' + s.email + '</a></li>' +
       C.factories.map(function (f) { return '<li>' + ico('i-pin') + '<span><b>' + esc(L(f.country)) + ':</b> ' + esc(L(f.addr)) + '</span></li>'; }).join('') +
       '</ul></div></div>' +
-      '<div class="f-bottom"><span>© <span data-year></span> ' + esc(L(s.tagline)) + '. ' + t('rights') + '</span><span class="f-langs">' + Object.keys(LANGS).map(function (k) { return '<a href="#" data-set-lang="' + k + '">' + LANGS[k] + '</a>'; }).join(' · ') + '</span></div></div></footer>' +
+      '<div class="f-bottom"><span>© <span data-year></span> ' + esc(L(s.tagline)) + '. ' + t('rights') + '</span><span class="f-langs">' + Object.keys(LANGS).map(function (k) { return '<a href="#" data-set-lang="' + k + '">' + LANGS[k] + '</a>'; }).join(' · ') + '</span></div><p class="f-credit" dir="ltr"><a href="https://bitweave.io" target="_blank" rel="noopener">by bitweave.io</a></p></div></footer>' +
       '<a class="fab" href="' + WA + '" target="_blank" rel="noopener" aria-label="' + t('chat') + '">' + ico('i-whatsapp') + '</a>';
   }
 
@@ -260,16 +260,18 @@
     if (l.units) r += '<div><dt>' + t('units') + '</dt><dd>' + l.units + '</dd></div>';
     return r;
   }
-  function card(l) {
-    var b = brand(l.brand), c = cat(l.cat), v0 = l.variants[0];
-    var sw = l.variants.length > 1 ? '<div class="swatches" role="group" aria-label="' + t('flavors') + '">' + l.variants.map(function (v, i) { return '<button type="button" class="sw' + (i ? '' : ' is-on') + '" data-sw="' + img(v.img) + '" title="' + esc(L(v.flavor)) + '" aria-label="' + esc(L(v.flavor)) + '"><img src="' + img(v.img) + '" alt="" loading="lazy"></button>'; }).join('') + '</div>' : '';
-    var q = ' data-quick data-title="' + esc(L(l.name)) + '" data-img="' + img(v0.img) + '" data-desc="' + esc(L(l.desc)) + '" data-weight="' + esc(L(l.weight)) + '" data-brand="' + esc(b.name_en) + '" data-bc="' + b.color + '" data-cat="' + esc(L(c.name)) + '" data-tint="' + l.tint + '" data-url="#product-' + l.slug + '" data-more-label="' + esc(t('details')) + '" data-wa="' + WA + '" data-wa-label="' + esc(t('orderWa')) + '" data-carton="' + esc(L(l.carton)) + '" data-variants="' + esc(JSON.stringify(l.variants.map(function (v) { return [img(v.img), L(v.flavor)]; }))) + '"';
+  function card(l, vi) {
+    var single = typeof vi === 'number' && l.variants.length > 1;
+    var b = brand(l.brand), c = cat(l.cat), v0 = single ? l.variants[vi] : l.variants[0];
+    var flv = single ? L(v0.flavor) : '', nm = L(l.name) + (flv ? ' – ' + flv : '');
+    var sw = !single && l.variants.length > 1 ? '<div class="swatches" role="group" aria-label="' + t('flavors') + '">' + l.variants.map(function (v, i) { return '<button type="button" class="sw' + (i ? '' : ' is-on') + '" data-sw="' + img(v.img) + '" title="' + esc(L(v.flavor)) + '" aria-label="' + esc(L(v.flavor)) + '"><img src="' + img(v.img) + '" alt="" loading="lazy"></button>'; }).join('') + '</div>' : '';
+    var q = ' data-quick data-title="' + esc(nm) + '" data-img="' + img(v0.img) + '" data-desc="' + esc(L(l.desc)) + '" data-weight="' + esc(L(l.weight)) + '" data-brand="' + esc(b.name_en) + '" data-bc="' + b.color + '" data-cat="' + esc(L(c.name)) + '" data-tint="' + l.tint + '" data-url="#product-' + l.slug + '" data-more-label="' + esc(t('details')) + '" data-wa="' + WA + '" data-wa-label="' + esc(t('orderWa')) + '" data-carton="' + esc(L(l.carton)) + '" data-variants="' + esc(JSON.stringify((single ? [v0] : l.variants).map(function (v) { return [img(v.img), L(v.flavor)]; }))) + '"';
     return '<article class="p-card' + (l.new ? ' is-new' : '') + '" data-tilt data-cat="' + c.slug + '" style="--tint:' + l.tint + '">' + (l.new ? '<span class="p-new">' + t('newLabel') + '</span>' : '') +
       '<a class="p-link" href="#product-' + l.slug + '">' +
-      '<div class="p-media"><span class="p-plate" aria-hidden="true">' + ico('d-plate') + '</span><img class="p-main" src="' + img(v0.img) + '" alt="' + esc(L(l.name)) + '" loading="lazy"></div>' +
-      '<div class="p-body"><span class="p-brand" style="--bc:' + b.color + '">' + esc(b.name_en) + '</span><h3 class="p-title">' + esc(L(l.name)) + '</h3>' +
-      '<div class="p-foot"><span class="p-tags">' + (L(l.weight) ? '<span class="p-weight">' + esc(L(l.weight)) + '</span>' : '') + (l.variants.length > 1 ? '<span class="p-weight">' + l.variants.length + ' ' + t('variantsN') + '</span>' : '') + '</span><span class="p-go" aria-hidden="true">' + ico('i-arrow', 'ico-dir') + '</span></div></div></a>' + sw +
-      '<button class="p-quick" type="button" aria-label="' + esc(t('quickV') + ': ' + L(l.name)) + '"' + q + '>' + ico('i-eye') + '</button></article>';
+      '<div class="p-media"><span class="p-plate" aria-hidden="true">' + ico('d-plate') + '</span><img class="p-main" src="' + img(v0.img) + '" alt="' + esc(nm) + '" loading="lazy"></div>' +
+      '<div class="p-body"><span class="p-brand" style="--bc:' + b.color + '">' + esc(b.name_en) + '</span><h3 class="p-title">' + esc(L(l.name)) + '</h3>' + (flv ? '<span class="p-flavor">' + esc(flv) + '</span>' : '') +
+      '<div class="p-foot"><span class="p-tags">' + (L(l.weight) ? '<span class="p-weight">' + esc(L(l.weight)) + '</span>' : '') + (!single && l.variants.length > 1 ? '<span class="p-weight">' + l.variants.length + ' ' + t('variantsN') + '</span>' : '') + '</span><span class="p-go" aria-hidden="true">' + ico('i-arrow', 'ico-dir') + '</span></div></div></a>' + sw +
+      '<button class="p-quick" type="button" aria-label="' + esc(t('quickV') + ': ' + nm) + '"' + q + '>' + ico('i-eye') + '</button></article>';
   }
 
   function showcase() {
@@ -285,12 +287,13 @@
   }
 
   function productsHome() {
-    var list = C.lines;
-    var chips = '<button class="chip" type="button" data-f="all" aria-pressed="true">' + t('all') + '<span class="n">' + list.length + '</span></button>' +
-      C.categories.map(function (c) { var n = list.filter(function (l) { return l.cat === c.key; }).length; return '<button class="chip" type="button" data-f="' + c.slug + '" aria-pressed="false">' + esc(L(c.name)) + '<span class="n">' + n + '</span></button>'; }).join('');
+    var list = C.lines, nv = function (l) { return l.variants.length; }, sum = function (a) { return a.reduce(function (x, l) { return x + nv(l); }, 0); };
+    var cards = list.map(function (l) { return l.variants.length > 1 ? l.variants.map(function (v, i) { return card(l, i); }).join('') : card(l); }).join('');
+    var chips = '<button class="chip" type="button" data-f="all" aria-pressed="true">' + t('all') + '<span class="n">' + sum(list) + '</span></button>' +
+      C.categories.map(function (c) { var n = sum(list.filter(function (l) { return l.cat === c.key; })); return '<button class="chip" type="button" data-f="' + c.slug + '" aria-pressed="false">' + esc(L(c.name)) + '<span class="n">' + n + '</span></button>'; }).join('');
     return '<section class="section" id="home-products"><span class="drift" data-speed="1" style="right:2%;top:40%;--s:40px">' + ico('d-choc') + '</span><div class="wrap"><header class="sec-head"><h2>' + esc(L(C.home.products_title)) + '</h2><p>' + esc(L(C.home.products_text)) + '</p></header>' +
       '<div class="chips" data-filter="#home-grid" role="group" aria-label="' + t('category') + '">' + chips + '</div>' +
-      '<div class="p-grid" id="home-grid">' + list.map(card).join('') + '</div></div></section>';
+      '<div class="p-grid" id="home-grid">' + cards + '</div></div></section>';
   }
 
   function roll() {
@@ -404,7 +407,7 @@
       C.categories.map(function (x) { return '<a class="chip" href="#cat-' + x.slug + '"' + (c && c.slug === x.slug ? ' aria-current="page"' : '') + '>' + esc(L(x.name)) + '<span class="n">' + linesOf(function (l) { return l.cat === x.key; }).length + '</span></a>'; }).join('');
     return pageHero(title, c ? L(c.desc) : b ? '' : t('productsLead'), crumbs, list[0] && list[0].variants[0].img) +
       '<section class="section" style="padding-top:clamp(40px,5vw,60px)"><div class="wrap"><nav class="chips" aria-label="' + t('category') + '">' + chips + '</nav>' +
-      '<div class="p-grid">' + list.map(card).join('') + '</div></div></section>' + cta();
+      '<div class="p-grid">' + list.map(function (l) { return card(l); }).join('') + '</div></div></section>' + cta();
   }
 
   function vProduct(slug) {
@@ -426,7 +429,7 @@
       '<div><dt>' + t('category') + '</dt><dd><a href="#cat-' + c.slug + '">' + esc(L(c.name)) + '</a></dd></div>' +
       '<div><dt>' + t('brand') + '</dt><dd><a href="#brand-' + b.slug + '">' + esc(bname(b)) + '</a></dd></div></dl>' +
       '<div class="pd-cta"><a class="btn" href="' + WA + '" target="_blank" rel="noopener">' + ico('i-whatsapp') + t('orderWa') + '</a><a class="btn btn-cream" href="#export">' + t('export') + '</a></div></div></div></div></section>' +
-      '<section class="section related"><div class="wrap"><header class="sec-head"><h2>' + t('related') + '</h2></header><div class="p-grid">' + rel.map(card).join('') + '</div></div></section>';
+      '<section class="section related"><div class="wrap"><header class="sec-head"><h2>' + t('related') + '</h2></header><div class="p-grid">' + rel.map(function (l) { return card(l); }).join('') + '</div></div></section>';
   }
 
   function vAbout() {

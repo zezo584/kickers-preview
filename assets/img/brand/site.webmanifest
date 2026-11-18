@@ -1,0 +1,22 @@
+{
+ "name": "Kickers Foods – كيكرز فودز",
+ "short_name": "Kickers",
+ "icons": [
+  {
+   "src": "icon-192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "icon-512.png",
+   "sizes": "512x512",
+   "type": "image/png"
+  }
+ ],
+ "theme_color": "#ED1C2E",
+ "background_color": "#FFF6E6",
+ "display": "standalone",
+ "lang": "ar",
+ "dir": "rtl",
+ "start_url": "../../../"
+}
