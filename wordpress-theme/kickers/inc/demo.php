@@ -284,6 +284,9 @@ function kk_run_import( $o ) {
 				update_post_meta( $id, '_kk_units', (string) $p['units'] );
 			}
 			update_post_meta( $id, '_kk_tint', $p['tint'] );
+			if ( ! empty( $p['banner_theme'] ) ) {
+				update_post_meta( $id, '_kk_banner_theme', $p['banner_theme'] );
+			}
 			if ( ! empty( $p['new'] ) ) {
 				update_post_meta( $id, '_kk_new', '1' );
 				update_post_meta( $id, '_kk_featured', '1' );

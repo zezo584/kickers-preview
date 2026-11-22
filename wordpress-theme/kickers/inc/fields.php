@@ -136,7 +136,7 @@ function kk_product_box( $post ) {
 	kk_field_check( 'kk_new', 'منتج جديد ★ (يظهر عليه "جديد" ويتعمله بانر رئيسي متحرك تلقائي)', $g( 'new' ) );
 	kk_field_check( 'kk_featured', 'اعرضه أول في الصفحة الرئيسية', $g( 'featured' ) );
 	kk_field_color( 'kk_tint', 'لون خلفية الكارت', $g( 'tint' ), '#FDEBCB' );
-	kk_field_select( 'kk_banner_theme', 'لون البانر لو المنتج جديد', $g( 'banner_theme' ), array( '' => 'تلقائي', 'red' => 'أحمر', 'gold' => 'أصفر', 'cocoa' => 'بني', 'cream' => 'كريمي' ) );
+	kk_field_select( 'kk_banner_theme', 'لون البانر لو المنتج جديد', $g( 'banner_theme' ), array( '' => 'تلقائي', 'red' => 'أحمر', 'gold' => 'أصفر', 'cocoa' => 'بني', 'cream' => 'كريمي', 'night' => 'أسود وذهبي' ) );
 	echo '</div><h4>النكهات / الأشكال</h4><div class="kk-grid">';
 	kk_field_media( 'kk_gallery', 'صور النكهات بالترتيب (أول صورة = الرئيسية)', $g( 'gallery' ), true, 'اختار صورة لكل نكهة. لو منتج بنكهة واحدة اختار صورة واحدة.' );
 	kk_field_textarea( 'kk_flavors', 'أسماء النكهات بنفس ترتيب الصور — سطر لكل نكهة', $g( 'flavors' ), array( 'rows' => 5, 'help' => 'الشكل: عربي | English | Français | Deutsch — مثال: موز | Banana | Banane | Banane' ) );
@@ -168,7 +168,7 @@ function kk_slide_box( $post ) {
 	echo '<div class="kk-grid">';
 	kk_field_check( 'kk_is_new', 'اعرض علامة "جديد"', $g( 'is_new' ) );
 	kk_field_text( 'kk_word', 'الكلمة الكبيرة في الخلفية (إنجليزي)', $g( 'word' ), array( 'dir' => 'ltr' ) );
-	kk_field_select( 'kk_theme', 'اللون', $g( 'theme' ) ? $g( 'theme' ) : 'red', array( 'red' => 'أحمر', 'cocoa' => 'بني', 'gold' => 'أصفر', 'cream' => 'كريمي' ) );
+	kk_field_select( 'kk_theme', 'اللون', $g( 'theme' ) ? $g( 'theme' ) : 'red', array( 'red' => 'أحمر', 'cocoa' => 'بني', 'gold' => 'أصفر', 'cream' => 'كريمي', 'night' => 'أسود وذهبي' ) );
 	kk_field_select( 'kk_decor', 'الزخارف', $g( 'decor' ) ? $g( 'decor' ) : 'wheat', array( 'wheat' => 'قمح وبسكويت', 'chocolate' => 'شوكولاتة', 'hazelnut' => 'بندق', 'biscuit' => 'بسكويت', 'none' => 'بدون' ) );
 	echo '</div><div class="kk-panel" data-show-mode="design"><div class="kk-grid kk-grid-3">';
 	kk_field_media( 'kk_img1', 'صورة المنتج الرئيسية', $g( 'img1' ) );
@@ -334,7 +334,7 @@ function kk_term_input( $k, $d, $val, $table = false ) {
 			kk_field_check( $name, $table ? 'نعم' : $label, $val );
 			break;
 		case 'theme':
-			kk_field_select( $name, $label, $val, array( 'red' => 'أحمر', 'cocoa' => 'بني', 'gold' => 'أصفر', 'cream' => 'كريمي' ) );
+			kk_field_select( $name, $label, $val, array( 'red' => 'أحمر', 'cocoa' => 'بني', 'gold' => 'أصفر', 'cream' => 'كريمي', 'night' => 'أسود وذهبي' ) );
 			break;
 		case 'decor':
 			kk_field_select( $name, $label, $val, array( 'wheat' => 'قمح وبسكويت', 'chocolate' => 'شوكولاتة', 'hazelnut' => 'بندق', 'biscuit' => 'بسكويت', 'none' => 'بدون' ) );

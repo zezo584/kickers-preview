@@ -79,6 +79,7 @@
     quickV: ['عرض سريع', 'Quick view', 'Aperçu', 'Schnellansicht'],
     variantsN: ['نكهات', 'flavours', 'saveurs', 'Sorten'],
     typesL: ['أنواع', 'lines', 'gammes', 'Linien'],
+    oneProduct: ['منتج واحد', '1 product', '1 produit', '1 Produkt'],
     welcomeT: ['لحظة سعادة في كل عبوة', 'A moment of happiness in every pack', 'Un moment de bonheur dans chaque paquet', 'Ein Glücksmoment in jeder Packung'],
     exportTo: ['نصدّر إلى', 'We export to', 'Nous exportons vers', 'Wir exportieren nach'],
     factoryHere: ['مصنع كيكرز', 'Kickers factory', 'Usine Kickers', 'Kickers-Werk'],
@@ -179,7 +180,7 @@
     var out = [], newThemes = ['gold', 'red'];
     linesOf(function (l) { return l.new; }).forEach(function (l, i) {
       var c = cat(l.cat);
-      out.push({ theme: newThemes[i % 2], word: 'NEW', isNew: true, title: t('newPrefix') + L(l.name), sub: L(l.desc), btn1: t('details'), url1: '#product-' + l.slug,
+      out.push({ theme: l.banner_theme || newThemes[i % 2], word: 'NEW', isNew: true, title: t('newPrefix') + L(l.name), sub: L(l.desc), btn1: t('details'), url1: '#product-' + l.slug,
         images: l.variants.slice(0, 3).map(function (v) { return v.img; }), decor: c.decor, label: L(l.name) });
     });
     C.categories.forEach(function (c) {
@@ -244,9 +245,10 @@
     var ls = linesOf(function (l) { return l.cat === c.key; });
     var a = ls[0].variants[0].img, b = (ls[1] ? ls[1].variants[0].img : (ls[0].variants[1] || ls[0].variants[0]).img);
     var n = ls.reduce(function (s, l) { return s + l.variants.length; }, 0);
+    var cnt = n === 1 ? t('oneProduct') : ls.length + ' ' + t('typesL') + (n > ls.length ? ' · ' + n + ' ' + t('variantsN') : '');
     return '<a class="cat-tile" data-reveal href="#cat-' + c.slug + '" style="--tile:' + c.color + ';--ink:' + c.ink + '">' +
-      '<span class="cat-imgs" aria-hidden="true"><img src="' + img(b) + '" alt="" loading="lazy"><img src="' + img(a) + '" alt="" loading="lazy"></span>' +
-      '<h3>' + esc(L(c.name)) + '</h3><p>' + esc(L(c.desc)) + '</p><span class="cat-meta"><span class="cat-count">' + ls.length + ' ' + t('typesL') + ' · ' + n + ' ' + t('variantsN') + '</span><span class="cat-go">' + ico('i-arrow', 'ico-dir') + '</span></span></a>';
+      '<span class="cat-imgs" aria-hidden="true">' + (b !== a ? '<img src="' + img(b) + '" alt="" loading="lazy">' : '') + '<img src="' + img(a) + '" alt="" loading="lazy"></span>' +
+      '<h3>' + esc(L(c.name)) + '</h3><p>' + esc(L(c.desc)) + '</p><span class="cat-meta"><span class="cat-count">' + cnt + '</span><span class="cat-go">' + ico('i-arrow', 'ico-dir') + '</span></span></a>';
   }
   function cats() {
     return '<section class="section cats"><span class="drift" data-speed="1.3" style="right:3%;top:12%;--s:52px">' + ico('d-biscuit') + '</span><div class="wrap"><header class="sec-head"><h2>' + esc(L(C.home.cats_title)) + '</h2><p>' + esc(L(C.home.cats_text)) + '</p></header>' +

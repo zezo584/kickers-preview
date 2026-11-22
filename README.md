@@ -1,4 +1,4 @@
-# Kickers Foods – new website (v2.2)
+# Kickers Foods – new website (v2.3)
 
 This is the redesign of [kickersfoods.com](https://kickersfoods.com/) for Kickers Food Industries.
 
@@ -17,12 +17,12 @@ The site is in four languages:
 | Path | What it is |
 |---|---|
 | `index.html` + `assets/` | Clickable preview of the whole site. See the page list below. |
-| `kickers-theme.zip` | Installable WordPress theme, v2.2.0 (Appearance → Themes → Upload). |
+| `kickers-theme.zip` | Installable WordPress theme, v2.3.0 (Appearance → Themes → Upload). |
 | `wordpress-theme/kickers/` | Theme source code. |
 
 The preview includes:
 - Home, with auto-playing banners: one per product type, plus one per new product.
-- Products: 26 products in 14 lines, each line with its flavours.
+- Products: 27 products in 15 lines, each line with its flavours.
 - 7 brands.
 - Export: interactive country map and packing table.
 - Become an agent.

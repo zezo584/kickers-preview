@@ -33,7 +33,13 @@ if ( ! $kk_cats ) {
 					<span class="cat-imgs" aria-hidden="true"><?php foreach ( $kk_imgs as $kk_i ) { echo kk_img( $kk_i, 'kk-product', array( 'alt' => '' ) ); } // phpcs:ignore ?></span>
 					<h3><?php echo esc_html( kk_term_name( $kk_c ) ); ?></h3>
 					<p><?php echo esc_html( kk_term_desc( $kk_c ) ); ?></p>
-					<span class="cat-meta"><span class="cat-count"><?php echo (int) count( $kk_posts ) . ' ' . esc_html( kk_t( 'typesL' ) ) . ' · ' . (int) $kk_vars . ' ' . esc_html( kk_t( 'variantsN' ) ); ?></span><span class="cat-go"><?php echo kk_arrow(); // phpcs:ignore ?></span></span>
+					<span class="cat-meta"><span class="cat-count"><?php
+					if ( $kk_vars <= 1 ) {
+						echo esc_html( kk_count_label( 1 ) );
+					} else {
+						echo (int) count( $kk_posts ) . ' ' . esc_html( kk_t( 'typesL' ) ) . ( $kk_vars > count( $kk_posts ) ? ' · ' . (int) $kk_vars . ' ' . esc_html( kk_t( 'variantsN' ) ) : '' );
+					}
+					?></span><span class="cat-go"><?php echo kk_arrow(); // phpcs:ignore ?></span></span>
 				</a>
 			<?php endforeach; ?>
 		</div>
