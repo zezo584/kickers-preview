@@ -59,7 +59,7 @@ function kk_defaults() {
 			'fac2_map' => 'https://maps.app.goo.gl/Q28yMjBVbhDkLxEq6',
 			'fac2_since' => '2019',
 			'facebook' => 'https://www.facebook.com/share/1A7YV93uor/',
-			'instagram' => 'https://www.instagram.com/kickers010/',
+			'instagram' => 'https://www.instagram.com/kickersfood/',
 			'tiktok' => '',
 			'youtube' => '',
 			'linkedin' => '',
